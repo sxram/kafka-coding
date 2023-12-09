@@ -61,7 +61,7 @@ confluent kafka topic produce <topic>
 confluent kafka topic produce <topic> --value-format avro --schema orders-avro-schema.json --parse-key
 ```
 
-# Build / Run
+## Java App Build / Run
 
 ```shell
 ./gradlew clean shadowJar
