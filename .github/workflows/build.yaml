@@ -14,9 +14,6 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      #- name: Setup Gradle
-      #  uses: gradle/gradle-build-action@v2
-
       - name: Gradlew
         run: ./gradlew
 
@@ -28,3 +25,6 @@ jobs:
 
       - name: Build
         run: ./gradlew shadowJar
+
+      - name: Test
+        run: ./gradlew test

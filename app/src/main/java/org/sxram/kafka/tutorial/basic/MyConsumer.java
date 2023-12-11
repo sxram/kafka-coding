@@ -32,10 +32,10 @@ public class MyConsumer {
         this.consumer = new KafkaConsumer<>(properties);
     }
 
-    public MyConsumer(final String topic, final Consumer<String, String> consumer) {
-        this.topic = topic;
-        this.consumer = consumer;
-    }
+//    public MyConsumer(final String topic, final Consumer<String, String> consumer) {
+//        this.topic = topic;
+//        this.consumer = consumer;
+//    }
 
     public void consume() {
         consumer.subscribe(List.of(topic));
@@ -45,6 +45,7 @@ public class MyConsumer {
             duration = duration + POLL_TIMEOUT.toMillis();
             poll();
         }
+        consumer.close();
     }
 
     private void poll() {
@@ -53,7 +54,6 @@ public class MyConsumer {
         for (ConsumerRecord<String, String> consumedRecord : records) {
             log.info("Consumed: key = {}, value = {}", consumedRecord.key(), consumedRecord.value());
         }
-        consumer.close();
     }
 
 }
