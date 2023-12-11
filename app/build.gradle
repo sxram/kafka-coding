@@ -15,9 +15,11 @@ plugins {
     id "com.github.davidmc24.gradle.plugin.avro" version "1.7.0"
 }
 
-sourceCompatibility = "16"
-targetCompatibility = "16"
-version = "0.0.1"
+java {
+    sourceCompatibility = "16"
+    targetCompatibility = "16"
+    version = "0.0.1"
+}
 
 repositories {
     mavenCentral()

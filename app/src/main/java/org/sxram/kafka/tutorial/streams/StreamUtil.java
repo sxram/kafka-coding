@@ -54,9 +54,9 @@ public class StreamUtil implements AutoCloseable {
     }
 
     public RandomizeProducer startNewRandomizer(Properties producerProps, String topic) {
-        RandomizeProducer rv = new RandomizeProducer(producerProps, topic);
-        executorService.submit(rv);
-        return rv;
+        RandomizeProducer producer = new RandomizeProducer(producerProps, topic);
+        executorService.submit(producer);
+        return producer;
     }
 
     public void createTopics(final Properties allProps,
@@ -68,7 +68,7 @@ public class StreamUtil implements AutoCloseable {
                 try {
                     future.get();
                 } catch (Exception ex) {
-                    log.error("Caught: {}", ex.getMessage(), ex);
+                    log.error("Caught: {}", ex.getMessage());
                 }
             });
 
