@@ -1,5 +1,7 @@
 # kafka-coding
 
+Inspired by [confluent tutorials](https://developer.confluent.io/tutorials).
+
 ## Confluent CLI
 
 ### Setup Confluent CLI
