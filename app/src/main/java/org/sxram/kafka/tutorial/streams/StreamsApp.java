@@ -13,7 +13,8 @@ import org.apache.kafka.streams.kstream.Produced;
 import java.util.Arrays;
 import java.util.Optional;
 import java.util.Properties;
-import java.util.concurrent.CountDownLatch;
+import java.util.TimerTask;
+import java.util.concurrent.*;
 
 @Slf4j
 public class StreamsApp {
@@ -68,8 +69,20 @@ public class StreamsApp {
 
                 Runtime.getRuntime().addShutdownHook(new Thread(kafkaStreams::close));
 
+                ScheduledExecutorService executorService = Executors.newScheduledThreadPool(1);
+                ScheduledFuture<Object> resultFuture
+                        = (ScheduledFuture<Object>) executorService.schedule(new TimerTask() {
+                    @Override
+                    public void run() {
+                        ignored.close();
+                        kafkaStreams.close();
+                        utility.close();
+                    }
+                }, 5, TimeUnit.SECONDS);
+
                 log.info("Kafka Streams App Started");
                 runKafkaStreams(kafkaStreams);
+                log.info("2");
             }
         }
     }

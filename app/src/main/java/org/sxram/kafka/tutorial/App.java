@@ -28,13 +28,15 @@ public class App {
             addCtrlCHandler();
 
             runProducerConsumer("config/");
-        } catch (IOException e) {
+            runStreamsApp("config/");
+        } catch (Exception e) {
             log.error("Caught: {}", e.getMessage(), e);
             throw new RuntimeException(e);
         }
     }
 
     public static void runProducerConsumer(final String configPathPrefix) throws IOException {
+        log.info("### Starting Producer/Consumer");
         new MyProducer(TOPIC,
                 Utils.mergeProperties(configPathPrefix + CLIENT_PROPERTIES, configPathPrefix + PRODUCER_PROPERTIES))
                 .produce(Files.readAllLines(Paths.get(configPathPrefix + PRODUCER_INPUT)));
@@ -44,6 +46,7 @@ public class App {
     }
 
     public static void runStreamsApp(final String configPathPrefix) throws Exception {
+        log.info("### Starting Streams");
         new StreamsApp().stream(Utils.mergeProperties(configPathPrefix + CLIENT_PROPERTIES,
                 configPathPrefix + STREAM_PROPERTIES));
     }
