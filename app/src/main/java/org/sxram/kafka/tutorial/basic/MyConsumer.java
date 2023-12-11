@@ -26,10 +26,13 @@ public class MyConsumer {
 
     private final String topic;
 
-    public MyConsumer(final String topic, final Properties properties) {
+    private final ConsumHandler<String, String> handler;
+
+    public MyConsumer(final String topic, final Properties properties, ConsumHandler<String, String> handler) {
         this.topic = topic;
         properties.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, CONSUME_OFFSET);
         this.consumer = new KafkaConsumer<>(properties);
+        this.handler = handler;
     }
 
 //    public MyConsumer(final String topic, final Consumer<String, String> consumer) {
@@ -52,7 +55,7 @@ public class MyConsumer {
         log.debug("Polling ...");
         ConsumerRecords<String, String> records = consumer.poll(POLL_TIMEOUT);
         for (ConsumerRecord<String, String> consumedRecord : records) {
-            log.info("Consumed: key = {}, value = {}", consumedRecord.key(), consumedRecord.value());
+            handler.handle(consumedRecord);
         }
     }
 

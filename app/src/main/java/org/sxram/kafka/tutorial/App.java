@@ -1,6 +1,7 @@
 package org.sxram.kafka.tutorial;
 
 import lombok.extern.slf4j.Slf4j;
+import org.sxram.kafka.tutorial.basic.ConsumHandler;
 import org.sxram.kafka.tutorial.basic.MyConsumer;
 import org.sxram.kafka.tutorial.basic.MyProducer;
 import org.sxram.kafka.tutorial.streams.StreamsApp;
@@ -41,7 +42,8 @@ public class App {
                 Utils.mergeProperties(configPathPrefix + CLIENT_PROPERTIES, configPathPrefix + PRODUCER_PROPERTIES))
                 .produce(Files.readAllLines(Paths.get(configPathPrefix + PRODUCER_INPUT)));
         new MyConsumer(TOPIC,
-                Utils.mergeProperties(configPathPrefix + CLIENT_PROPERTIES, configPathPrefix + CONSUMER_PROPERTIES))
+                Utils.mergeProperties(configPathPrefix + CLIENT_PROPERTIES, configPathPrefix + CONSUMER_PROPERTIES),
+                new ConsumHandler<>())
                 .consume();
     }
 
