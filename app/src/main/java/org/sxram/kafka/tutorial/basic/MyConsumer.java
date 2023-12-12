@@ -20,7 +20,7 @@ public class MyConsumer {
 
     private static final String CONSUME_OFFSET = "earliest";
     private static final Duration POLL_TIMEOUT = Duration.ofMillis(500);
-    private static final Duration POLL_DURATION = Duration.ofSeconds(10);
+    private static final Duration POLL_DURATION = Duration.ofSeconds(5);
 
     private final Consumer<String, String> consumer;
 

@@ -79,5 +79,5 @@ shadowJar {
 }
 
 application {
-    mainClassName = javaMainClass
+    getMainClass().set(javaMainClass)
 }
