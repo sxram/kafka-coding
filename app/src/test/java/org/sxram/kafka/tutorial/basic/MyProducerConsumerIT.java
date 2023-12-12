@@ -27,7 +27,7 @@ class MyProducerConsumerIT {
                 Utils.mergeProperties(CONFIG_PATH_PREFIX + App.CLIENT_PROPERTIES,
                         CONFIG_PATH_PREFIX + App.CONSUMER_PROPERTIES), handlerMock, Duration.ofSeconds(3)).consume();
 
-        verify(handlerMock, atLeastOnce()).process(any());
+        verify(handlerMock, atLeastOnce()).accept(any());
     }
 
 }

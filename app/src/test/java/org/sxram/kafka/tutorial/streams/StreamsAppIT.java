@@ -29,7 +29,7 @@ class StreamsAppIT {
         props.put("group.id", "kafka-java-getting-started");
         new MyConsumer(outputTopic, props, handlerMock, Duration.ofSeconds(3)).consume();
 
-        verify(handlerMock, atLeastOnce()).process(any());
+        verify(handlerMock, atLeastOnce()).accept(any());
     }
 
 }
