@@ -47,7 +47,7 @@ public class App {
     public static void runStreamsApp(final String configPathPrefix) throws Exception {
         log.info("### Starting Streams");
         new StreamsApp().stream(Utils.mergeProperties(configPathPrefix + CLIENT_PROPERTIES,
-                configPathPrefix + STREAM_PROPERTIES));
+                configPathPrefix + STREAM_PROPERTIES), Duration.ofSeconds(5));
     }
 
 }

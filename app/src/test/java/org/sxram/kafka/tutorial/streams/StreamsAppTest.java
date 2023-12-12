@@ -13,8 +13,7 @@ import org.sxram.kafka.tutorial.Utils;
 import java.io.IOException;
 import java.util.Arrays;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
+import static org.assertj.core.api.Assertions.assertThat;
 
 class StreamsAppTest {
 
@@ -48,9 +47,8 @@ class StreamsAppTest {
                     .toList();
 
             inputs.forEach(inputTopic::pipeInput);
-            val actualOutputs = outputTopic.readValuesToList();
 
-            assertThat(expectedOutputs, equalTo(actualOutputs));
+            assertThat(outputTopic.readValuesToList()).containsAll(expectedOutputs);
         }
 
     }

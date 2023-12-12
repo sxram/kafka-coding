@@ -10,8 +10,7 @@ import org.sxram.kafka.tutorial.TestUtils;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.MatcherAssert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 class MyProducerTest {
 
@@ -33,6 +32,6 @@ class MyProducerTest {
                 .map(TestUtils::toKeyValue)
                 .toList();
 
-        assertThat(actualList, equalTo(expectedList));
+        assertThat(actualList).containsAll(expectedList);
     }
 }

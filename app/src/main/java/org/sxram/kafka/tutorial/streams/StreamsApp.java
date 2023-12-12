@@ -11,6 +11,7 @@ import org.apache.kafka.streams.kstream.Consumed;
 import org.apache.kafka.streams.kstream.Produced;
 import org.sxram.kafka.tutorial.Utils;
 
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.Optional;
 import java.util.Properties;
@@ -22,8 +23,6 @@ import java.util.concurrent.TimeUnit;
 
 @Slf4j
 public class StreamsApp {
-
-    public static final int RUN_DURATION_IN_SECONDS = 5;
 
     static void runKafkaStreams(final KafkaStreams streams) {
         final CountDownLatch latch = new CountDownLatch(1);
@@ -59,7 +58,7 @@ public class StreamsApp {
         return builder.build();
     }
 
-    public void stream(Properties props) throws Exception {
+    public void stream(Properties props, Duration duration) throws Exception {
         final String inputTopic = props.getProperty("input.topic.name");
         final String outputTopic = props.getProperty("output.topic.name");
 
@@ -75,7 +74,7 @@ public class StreamsApp {
 
                 Runtime.getRuntime().addShutdownHook(new Thread(kafkaStreams::close));
 
-                scheduleStreamingTermination(randomizeProducer, kafkaStreams);
+                scheduleStreamingTermination(randomizeProducer, kafkaStreams, duration);
 
                 log.info("Starting Kafka Streams");
                 runKafkaStreams(kafkaStreams);
@@ -84,7 +83,9 @@ public class StreamsApp {
         }
     }
 
-    private void scheduleStreamingTermination(StreamUtil.RandomizeProducer randomizeProducer, KafkaStreams kafkaStreams) {
+    private void scheduleStreamingTermination(StreamUtil.RandomizeProducer randomizeProducer,
+                                              KafkaStreams kafkaStreams,
+                                              Duration duration) {
         ScheduledExecutorService executorService = Executors.newScheduledThreadPool(1);
         executorService.schedule(new TimerTask() {
             @Override
@@ -92,7 +93,7 @@ public class StreamsApp {
                 randomizeProducer.close();
                 kafkaStreams.close();
             }
-        }, RUN_DURATION_IN_SECONDS, TimeUnit.SECONDS);
+        }, duration.toSeconds(), TimeUnit.SECONDS);
     }
 
 }

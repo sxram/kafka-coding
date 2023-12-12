@@ -19,7 +19,7 @@ class StreamsAppIT {
     void consumesStreamedMessage() throws Exception {
         Properties props = Utils.mergeProperties(CONFIG_PATH_PREFIX + App.CLIENT_PROPERTIES,
                 CONFIG_PATH_PREFIX + App.STREAM_PROPERTIES);
-        new StreamsApp().stream(props);
+        new StreamsApp().stream(props, Duration.ofSeconds(5));
 
         // assert stream by consuming output topic
         RecordProcessor<String, String> handlerMock = spy(new RecordProcessor<>());
