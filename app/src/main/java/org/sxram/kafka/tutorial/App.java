@@ -5,7 +5,6 @@ import org.sxram.kafka.tutorial.basic.ConsumHandler;
 import org.sxram.kafka.tutorial.basic.MyConsumer;
 import org.sxram.kafka.tutorial.basic.MyProducer;
 import org.sxram.kafka.tutorial.streams.StreamsApp;
-import sun.misc.Signal;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -25,11 +24,8 @@ public class App {
     public static void main(String[] args) {
         try {
             log.info("Starting");
-
-            addCtrlCHandler();
-
-            runProducerConsumer("config/");
-            runStreamsApp("config/");
+            runProducerConsumer("../config/");
+            runStreamsApp("../config/");
         } catch (Exception e) {
             log.error("Caught: {}", e.getMessage(), e);
             throw new RuntimeException(e);
@@ -51,13 +47,6 @@ public class App {
         log.info("### Starting Streams");
         new StreamsApp().stream(Utils.mergeProperties(configPathPrefix + CLIENT_PROPERTIES,
                 configPathPrefix + STREAM_PROPERTIES));
-    }
-
-    private static void addCtrlCHandler() {
-        Signal.handle(new Signal("INT"), signal -> {
-            log.info("Interrupted by Ctrl+C");
-            System.exit(130);
-        });
     }
 
 }
