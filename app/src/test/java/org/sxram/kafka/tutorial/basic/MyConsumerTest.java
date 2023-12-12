@@ -13,6 +13,6 @@ class MyConsumerTest {
     void trowsExceptionWhenPollIntervalTooSmall() {
         assertThrows(IllegalArgumentException.class, () -> new MyConsumer(App.TOPIC,
                 Utils.mergeProperties(CONFIG_PATH_PREFIX + App.CLIENT_PROPERTIES,
-                        CONFIG_PATH_PREFIX + App.CONSUMER_PROPERTIES), new ConsumHandler<>(), MyConsumer.POLL_TIMEOUT));
+                        CONFIG_PATH_PREFIX + App.CONSUMER_PROPERTIES), new RecordProcessor<>(), MyConsumer.POLL_TIMEOUT));
     }
 }

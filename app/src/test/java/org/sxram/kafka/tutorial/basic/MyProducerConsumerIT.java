@@ -17,7 +17,7 @@ class MyProducerConsumerIT {
 
     @Test
     void consumesProducedMessageWithHandlerMock() throws IOException {
-        ConsumHandler<String, String> handlerMock = spy(new ConsumHandler<>());
+        RecordProcessor<String, String> handlerMock = spy(new RecordProcessor<>());
 
         new MyProducer(App.TOPIC,
                 Utils.mergeProperties(CONFIG_PATH_PREFIX + App.CLIENT_PROPERTIES,
@@ -27,7 +27,7 @@ class MyProducerConsumerIT {
                 Utils.mergeProperties(CONFIG_PATH_PREFIX + App.CLIENT_PROPERTIES,
                         CONFIG_PATH_PREFIX + App.CONSUMER_PROPERTIES), handlerMock, Duration.ofSeconds(3)).consume();
 
-        verify(handlerMock, atLeastOnce()).handle(any());
+        verify(handlerMock, atLeastOnce()).process(any());
     }
 
 }
