@@ -11,6 +11,10 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Map;
 import java.util.Properties;
+import java.util.TimerTask;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 
 @Slf4j
@@ -65,6 +69,17 @@ public class Utils {
             value = parts[0];
         }
         return Pair.of(key, value);
+    }
+
+    public static void terminateApp(int durationInSeconds) {
+        ScheduledExecutorService executorService = Executors.newScheduledThreadPool(1);
+        executorService.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                log.info("Terminating after " + durationInSeconds + "s");
+                System.exit(0);
+            }
+        }, durationInSeconds, TimeUnit.SECONDS);
     }
 
 }

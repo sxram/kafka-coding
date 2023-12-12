@@ -15,7 +15,7 @@ import static org.sxram.kafka.tutorial.TestUtils.CONFIG_PATH_PREFIX;
 class MyProducerConsumerIT {
 
     @Test
-    void starts() throws IOException {
+    void consumesProducedMessage() throws IOException {
         ConsumHandler<String, String> handlerMock = spy(new ConsumHandler<>());
 
         new MyProducer(App.TOPIC,

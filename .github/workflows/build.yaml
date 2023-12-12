@@ -25,6 +25,8 @@ jobs:
           sed -i 's/{{ TODO_REGISTRY_SERVER }}/${ vars.CONFLUENT_SERVER }/g' ./config/client.properties
           sed -i 's/{{ TODO_REGISTRY_KEY }}/${ vars.CONFLUENT_API_KEY }/g' ./config/client.properties
           sed -i 's/{{ TODO_REGISTRY_SECRET }}/${ vars.CONFLUENT_API_KEY_SECRET }/g' ./config/client.properties
+          cat ./config/client.properties
+
       - name: Build
         run: ./gradlew shadowJar
 

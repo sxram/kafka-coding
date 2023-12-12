@@ -9,15 +9,17 @@ import org.apache.kafka.streams.StreamsBuilder;
 import org.apache.kafka.streams.Topology;
 import org.apache.kafka.streams.kstream.Consumed;
 import org.apache.kafka.streams.kstream.Produced;
+import org.sxram.kafka.tutorial.Utils;
 
 import java.util.Arrays;
 import java.util.Optional;
 import java.util.Properties;
-import java.util.TimerTask;
-import java.util.concurrent.*;
+import java.util.concurrent.CountDownLatch;
 
 @Slf4j
 public class StreamsApp {
+
+    public static final int RUN_DURATION_IN_SECONDS = 5;
 
     static void runKafkaStreams(final KafkaStreams streams) {
         final CountDownLatch latch = new CountDownLatch(1);
@@ -69,21 +71,14 @@ public class StreamsApp {
 
                 Runtime.getRuntime().addShutdownHook(new Thread(kafkaStreams::close));
 
-                ScheduledExecutorService executorService = Executors.newScheduledThreadPool(1);
-                ScheduledFuture<Object> resultFuture
-                        = (ScheduledFuture<Object>) executorService.schedule(new TimerTask() {
-                    @Override
-                    public void run() {
-                        ignored.close();
-                        kafkaStreams.close();
-                        utility.close();
-                    }
-                }, 5, TimeUnit.SECONDS);
+                Utils.terminateApp(RUN_DURATION_IN_SECONDS);
 
-                log.info("Kafka Streams App Started");
+                log.info("Starting Kafka Streams");
                 runKafkaStreams(kafkaStreams);
-                log.info("2");
+                log.info("Terminated Kafka Streams");
             }
         }
     }
+
+
 }

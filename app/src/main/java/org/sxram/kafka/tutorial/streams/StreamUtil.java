@@ -14,6 +14,8 @@ import java.util.stream.Collectors;
 @Slf4j
 public class StreamUtil implements AutoCloseable {
 
+    public static final int PRODUCER_DELAY_IN_MILLIS = 2000;
+
     private ExecutorService executorService = Executors.newFixedThreadPool(1);
 
     public static class RandomizeProducer implements AutoCloseable, Runnable {
@@ -42,7 +44,7 @@ public class StreamUtil implements AutoCloseable {
         private void produce(KafkaProducer<String, String> producer, Faker faker) throws ExecutionException {
             try {
                 producer.send(new ProducerRecord<>(this.topic, faker.chuckNorris().fact())).get();
-                Thread.sleep(5000);
+                Thread.sleep(PRODUCER_DELAY_IN_MILLIS);
             } catch (InterruptedException e) {
                 log.warn("{}", e.getMessage());
             }
