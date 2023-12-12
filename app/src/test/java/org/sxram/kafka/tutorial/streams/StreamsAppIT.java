@@ -20,8 +20,11 @@ class StreamsAppIT {
                 CONFIG_PATH_PREFIX + App.STREAM_PROPERTIES);
         new StreamsApp().stream(props);
 
+        // assert stream by consuming output topic
         ConsumHandler<String, String> handlerMock = spy(new ConsumHandler<>());
         final String outputTopic = props.getProperty("output.topic.name");
+        props.put("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
+        props.put("value.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
         new MyConsumer(outputTopic, props, handlerMock).consume();
 
         verify(handlerMock, atLeastOnce()).handle(any());

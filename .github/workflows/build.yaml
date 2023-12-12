@@ -14,8 +14,8 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Gradlew
-        run: ./gradlew
+      - name: Setup Gradle
+        uses: gradle/gradle-build-action@v2
 
       - name: Prepare
         run: |
