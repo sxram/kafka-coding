@@ -7,6 +7,7 @@ import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
+import org.apache.kafka.clients.producer.Producer;
 import org.sxram.kafka.tutorial.Utils;
 
 import javax.annotation.Nullable;
@@ -19,8 +20,7 @@ import java.util.Properties;
 public class MyConsumer {
 
     private static final String CONSUME_OFFSET = "earliest";
-    private static final Duration POLL_TIMEOUT = Duration.ofMillis(500);
-    private static final Duration POLL_DURATION = Duration.ofSeconds(5);
+    static final Duration POLL_TIMEOUT = Duration.ofMillis(500);
 
     private final Consumer<String, String> consumer;
 
@@ -28,18 +28,36 @@ public class MyConsumer {
 
     private final ConsumHandler<String, String> handler;
 
-    public MyConsumer(final String topic, final Properties properties, ConsumHandler<String, String> handler) {
+    private final Duration pollingDuration;
+
+    public MyConsumer(final String topic, final Properties properties, ConsumHandler<String, String> handler,
+                      final Duration pollingDuration) {
+        if (pollingDuration.compareTo(POLL_TIMEOUT) <= 0) {
+            throw new IllegalArgumentException("Polling duration too small (<" + POLL_TIMEOUT + ")");
+        }
         this.topic = topic;
+        this.handler = handler;
+        this.pollingDuration = pollingDuration;
         properties.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, CONSUME_OFFSET);
         this.consumer = new KafkaConsumer<>(properties);
+    }
+
+    public MyConsumer(final String topic, final Consumer<String, String> consumer, ConsumHandler<String, String> handler,
+                      final Duration pollingDuration) {
+        if (pollingDuration.compareTo(POLL_TIMEOUT) <= 0) {
+            throw new IllegalArgumentException("Polling duration too small (<" + POLL_TIMEOUT + ")");
+        }
+        this.topic = topic;
         this.handler = handler;
+        this.pollingDuration = pollingDuration;
+        this.consumer = consumer;
     }
 
     public void consume() {
         consumer.subscribe(List.of(topic));
 
         long duration = 0;
-        while (duration < POLL_DURATION.toMillis()) {
+        while (duration < pollingDuration.toMillis()) {
             duration = duration + POLL_TIMEOUT.toMillis();
             poll();
         }

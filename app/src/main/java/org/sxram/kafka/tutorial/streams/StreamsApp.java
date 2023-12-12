@@ -14,7 +14,11 @@ import org.sxram.kafka.tutorial.Utils;
 import java.util.Arrays;
 import java.util.Optional;
 import java.util.Properties;
+import java.util.TimerTask;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 @Slf4j
 public class StreamsApp {
@@ -65,13 +69,13 @@ public class StreamsApp {
                             new NewTopic(inputTopic, Optional.empty(), Optional.empty()),
                             new NewTopic(outputTopic, Optional.empty(), Optional.empty())));
 
-            try (StreamUtil.RandomizeProducer ignored = utility.startNewRandomizer(props, inputTopic)) {
+            try (StreamUtil.RandomizeProducer randomizeProducer = utility.startNewRandomizer(props, inputTopic)) {
 
                 KafkaStreams kafkaStreams = new KafkaStreams(buildTopology(inputTopic, outputTopic), props);
 
                 Runtime.getRuntime().addShutdownHook(new Thread(kafkaStreams::close));
 
-                Utils.terminateApp(RUN_DURATION_IN_SECONDS);
+                scheduleStreamingTermination(randomizeProducer, kafkaStreams);
 
                 log.info("Starting Kafka Streams");
                 runKafkaStreams(kafkaStreams);
@@ -80,5 +84,15 @@ public class StreamsApp {
         }
     }
 
+    private void scheduleStreamingTermination(StreamUtil.RandomizeProducer randomizeProducer, KafkaStreams kafkaStreams) {
+        ScheduledExecutorService executorService = Executors.newScheduledThreadPool(1);
+        executorService.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                randomizeProducer.close();
+                kafkaStreams.close();
+            }
+        }, RUN_DURATION_IN_SECONDS, TimeUnit.SECONDS);
+    }
 
 }

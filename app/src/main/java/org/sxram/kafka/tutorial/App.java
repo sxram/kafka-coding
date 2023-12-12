@@ -9,6 +9,7 @@ import org.sxram.kafka.tutorial.streams.StreamsApp;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.time.Duration;
 
 @Slf4j
 public class App {
@@ -39,7 +40,7 @@ public class App {
                 .produce(Files.readAllLines(Paths.get(configPathPrefix + PRODUCER_INPUT)));
         new MyConsumer(TOPIC,
                 Utils.mergeProperties(configPathPrefix + CLIENT_PROPERTIES, configPathPrefix + CONSUMER_PROPERTIES),
-                new ConsumHandler<>())
+                new ConsumHandler<>(), Duration.ofSeconds(3))
                 .consume();
     }
 
