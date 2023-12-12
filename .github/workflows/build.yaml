@@ -28,7 +28,7 @@ jobs:
           cat ./config/client.properties
 
       - name: Build
-        run: ./gradlew shadowJar
+        run: ./gradlew shadowJar --warning-mode all
 
       - name: Test
-        run: ./gradlew test -i
+        run: ./gradlew test -i --warning-mode all

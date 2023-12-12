@@ -19,8 +19,8 @@ import java.util.Properties;
 public class MyConsumer {
 
     private static final String CONSUME_OFFSET = "earliest";
-    private static final Duration POLL_TIMEOUT = Duration.ofMillis(250);
-    private static final Duration POLL_DURATION = Duration.ofSeconds(3);
+    private static final Duration POLL_TIMEOUT = Duration.ofMillis(500);
+    private static final Duration POLL_DURATION = Duration.ofSeconds(10);
 
     private final Consumer<String, String> consumer;
 
@@ -34,11 +34,6 @@ public class MyConsumer {
         this.consumer = new KafkaConsumer<>(properties);
         this.handler = handler;
     }
-
-//    public MyConsumer(final String topic, final Consumer<String, String> consumer) {
-//        this.topic = topic;
-//        this.consumer = consumer;
-//    }
 
     public void consume() {
         consumer.subscribe(List.of(topic));
