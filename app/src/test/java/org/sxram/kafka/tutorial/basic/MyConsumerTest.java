@@ -29,6 +29,12 @@ class MyConsumerTest {
                         CONFIG_PATH_PREFIX + App.CONSUMER_PROPERTIES), new RecordProcessor<>(), MyConsumer.POLL_TIMEOUT));
     }
 
+    /**
+     * taken from here: https://www.baeldung.com/kafka-mockconsumer
+     * error: Cannot add records for a partition that is not assigned to the consumer
+     * java.lang.IllegalStateException: Cannot add records for a partition that is not assigned to the consumer
+     * 	at org.apache.kafka.clients.consumer.MockConsumer.addRecord(MockConsumer.java:232)
+     */
     @Test
     @Disabled
     void consumes() {
