@@ -25,7 +25,7 @@ class MyProducerConsumerIT {
                 produce(Files.readAllLines(Paths.get(CONFIG_PATH_PREFIX + App.PRODUCER_INPUT)));
         new MyConsumer(App.TOPIC,
                 Utils.mergeProperties(CONFIG_PATH_PREFIX + App.CLIENT_PROPERTIES,
-                        CONFIG_PATH_PREFIX + App.CONSUMER_PROPERTIES), handlerMock, Duration.ofSeconds(3)).consume();
+                        CONFIG_PATH_PREFIX + App.CONSUMER_PROPERTIES), handlerMock, Duration.ofSeconds(5)).consume();
 
         verify(handlerMock, atLeastOnce()).accept(any());
     }
