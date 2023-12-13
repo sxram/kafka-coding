@@ -16,7 +16,7 @@ import java.util.Properties;
 /**
  * Test against confluent server.
  */
-class StreamsAppIT {
+class StreamsAppConfluenceIT {
 
     @Test
     void consumesStreamedMessage() throws Exception {
