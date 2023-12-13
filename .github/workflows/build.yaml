@@ -4,7 +4,7 @@ on:
  push:
 
 env:
-  CLIENT_CONFIG: ./config/client.properties
+  CLIENT_CONFIG: ./config/client_confluent.properties
 
 jobs:
   build:
