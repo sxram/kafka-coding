@@ -41,7 +41,11 @@ confluent api-key use $API_KEY
 
 Build jar and run
 ```shell
-./gradlew clean shadowJar
+./gradlew clean build
+```
+or skip tests:
+```shell
+./gradlew clean build -x test
 ```
 ```shell
 java -jar ./app/build/libs/kafka-java-getting-started-0.0.1-all.jar

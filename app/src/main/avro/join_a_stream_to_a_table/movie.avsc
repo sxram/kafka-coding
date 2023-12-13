@@ -1,0 +1,10 @@
+{
+  "namespace": "org.sxram.kafka.tutorial.join_a_stream_to_a_movie.avro",
+  "type": "record",
+  "name": "Movie",
+  "fields": [
+    {"name": "id", "type": "long"},
+    {"name": "title", "type": "string"},
+    {"name": "release_year", "type": "int"}
+  ]
+}

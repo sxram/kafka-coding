@@ -18,6 +18,7 @@ public class App {
     public static final String PRODUCER_INPUT = "producer_input.txt";
 
     public static final String CLIENT_PROPERTIES = "client_confluent.properties";
+    // public static final String CLIENT_LOCAL_PROPERTIES = "client_local.properties";
     public static final String CONSUMER_PROPERTIES = "consumer.properties";
     public static final String PRODUCER_PROPERTIES = "producer.properties";
     public static final String STREAM_PROPERTIES = "stream.properties";

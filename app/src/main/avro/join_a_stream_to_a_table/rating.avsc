@@ -1,0 +1,9 @@
+{
+  "namespace": "org.sxram.kafka.tutorial.join_a_stream_to_a_movie.avro",
+  "type": "record",
+  "name": "Rating",
+  "fields": [
+    {"name": "id", "type": "long"},
+    {"name": "rating", "type": "double"}
+  ]
+}
