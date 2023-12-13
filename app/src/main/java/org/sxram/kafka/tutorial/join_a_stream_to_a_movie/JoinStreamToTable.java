@@ -53,13 +53,13 @@ public class JoinStreamToTable {
         KStream<String, Rating> ratingsStream = builder.<String, Rating>stream(ratingTopic)
                 .map((key, rating) -> new KeyValue<>(String.valueOf(rating.getId()), rating));
 
-        KStream<String, RatedMovie> ratedMovie = ratingsStream.join(moviesTable, joiner);
-
         // "When you join a stream and a table, you get a new stream, but you must be explicit about the value of that stream—the combination
         // between the value in the stream and the associated value in the table. The ValueJoiner interface in the Streams API does this work.
         // The single apply() method takes the stream and table values as parameters, and returns the value of the joined stream as output.
         // (Their keys are not a part of the equation, because they are equal by definition and do not change in the result.)"
-        ratedMovie.to(ratedMoviesTopic, Produced.with(Serdes.String(), ratedMovieAvroSerde(allProps)));
+        KStream<String, RatedMovie> ratedMovieStream = ratingsStream.join(moviesTable, joiner);
+
+        ratedMovieStream.to(ratedMoviesTopic, Produced.with(Serdes.String(), ratedMovieAvroSerde(allProps)));
 
         return builder.build();
     }
