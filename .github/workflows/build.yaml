@@ -22,12 +22,12 @@ jobs:
 
       - name: Prepare
         run: |
-          sed -i 's/{{ TODO_SERVER }}/${{ vars.CONFLUENT_SERVER }}/g' ${{ env.CLIENT_CONFIG }}
-          sed -i 's/{{ TODO_KEY }}/${{ secrets.CONFLUENT_API_KEY }}/g' ${{ env.CLIENT_CONFIG }}
-          sed -i 's/{{ TODO_SECRET }}/${{ secrets.CONFLUENT_API_KEY_SECRET }}/g' ${{ env.CLIENT_CONFIG }}
-          sed -i 's/{{ TODO_REGISTRY_SERVER }}/${{ vars.CONFLUENT_SERVER }}/g' ${{ env.CLIENT_CONFIG }}
-          sed -i 's/{{ TODO_REGISTRY_KEY }}/${{ secrets.CONFLUENT_API_KEY }}/g' ${{ env.CLIENT_CONFIG }}
-          sed -i 's/{{ TODO_REGISTRY_SECRET }}/${{ secrets.CONFLUENT_API_KEY_SECRET }}/g' ${{ env.CLIENT_CONFIG }}
+          sed -i 's+{{ TODO_SERVER }}+${{ vars.CONFLUENT_SERVER }}+g' ${{ env.CLIENT_CONFIG }}
+          sed -i 's+{{ TODO_KEY }}+${{ secrets.CONFLUENT_API_KEY }}+g' ${{ env.CLIENT_CONFIG }}
+          sed -i 's+{{ TODO_SECRET }}+${{ secrets.CONFLUENT_API_KEY_SECRET }}+g' ${{ env.CLIENT_CONFIG }}
+          sed -i 's+{{ TODO_REGISTRY_SERVER }}+${{ vars.CONFLUENT_SERVER }}+g' ${{ env.CLIENT_CONFIG }}
+          sed -i 's+{{ TODO_REGISTRY_KEY }}+${{ secrets.CONFLUENT_API_KEY }}+g' ${{ env.CLIENT_CONFIG }}
+          sed -i 's+{{ TODO_REGISTRY_SECRET }}+${{ secrets.CONFLUENT_API_KEY_SECRET }}+g' ${{ env.CLIENT_CONFIG }}
           cat ${{ env.CLIENT_CONFIG }}
 
       - name: Build
