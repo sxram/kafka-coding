@@ -31,25 +31,34 @@ import java.util.concurrent.CountDownLatch;
 public class JoinStreamToTable {
 
     public Topology buildTopology(Properties allProps) {
-        final StreamsBuilder builder = new StreamsBuilder();
         final String movieTopic = allProps.getProperty("movie.topic.name");
         final String rekeyedMovieTopic = allProps.getProperty("rekeyed.movie.topic.name");
         final String ratingTopic = allProps.getProperty("rating.topic.name");
         final String ratedMoviesTopic = allProps.getProperty("rated.movies.topic.name");
+
+        final StreamsBuilder builder = new StreamsBuilder();
         final MovieRatingJoiner joiner = new MovieRatingJoiner();
 
+        // "The problem is that we can’t make any assumptions about the key of this stream, so we have to repartition it explicitly.
+        // We use the map() method for that, creating a new KeyValue instance for each record, using the movie ID as the new key."
         KStream<String, Movie> movieStream = builder.<String, Movie>stream(movieTopic)
                 .map((key, movie) -> new KeyValue<>(String.valueOf(movie.getId()), movie));
 
         movieStream.to(rekeyedMovieTopic);
 
-        KTable<String, Movie> movies = builder.table(rekeyedMovieTopic);
+        KTable<String, Movie> moviesTable = builder.table(rekeyedMovieTopic);
 
-        KStream<String, Rating> ratings = builder.<String, Rating>stream(ratingTopic)
+        // Creating the KStream<String,Rating> of ratings looks just like our first step with the movies: we create a stream
+        // from the topic, then repartition it with the map() method. Note that we must choose the same key—movie ID—for our join to work.
+        KStream<String, Rating> ratingsStream = builder.<String, Rating>stream(ratingTopic)
                 .map((key, rating) -> new KeyValue<>(String.valueOf(rating.getId()), rating));
 
-        KStream<String, RatedMovie> ratedMovie = ratings.join(movies, joiner);
+        KStream<String, RatedMovie> ratedMovie = ratingsStream.join(moviesTable, joiner);
 
+        // "When you join a stream and a table, you get a new stream, but you must be explicit about the value of that stream—the combination
+        // between the value in the stream and the associated value in the table. The ValueJoiner interface in the Streams API does this work.
+        // The single apply() method takes the stream and table values as parameters, and returns the value of the joined stream as output.
+        // (Their keys are not a part of the equation, because they are equal by definition and do not change in the result.)"
         ratedMovie.to(ratedMoviesTopic, Produced.with(Serdes.String(), ratedMovieAvroSerde(allProps)));
 
         return builder.build();
@@ -89,12 +98,8 @@ public class JoinStreamToTable {
     }
 
     public static void main(String[] args) {
-        if (args.length < 1) {
-            throw new IllegalArgumentException("This program takes one argument: the path to an environment configuration file.");
-        }
-
         JoinStreamToTable ts = new JoinStreamToTable();
-        Properties allProps = Utils.mergeProperties(App.CLIENT_PROPERTIES, "join-a-stream-to-a-table.properties");
+        Properties allProps = Utils.mergeProperties("config/" + App.CLIENT_CONFLUENT_PROPERTIES, "config/" + "join-a-stream-to-a-table.properties");
         allProps.put(StreamsConfig.DEFAULT_KEY_SERDE_CLASS_CONFIG, Serdes.String().getClass());
         allProps.put(StreamsConfig.DEFAULT_VALUE_SERDE_CLASS_CONFIG, SpecificAvroSerde.class);
         Topology topology = ts.buildTopology(allProps);

@@ -25,7 +25,7 @@ class MyConsumerTest {
     void throwsExceptionWhenPollIntervalTooSmall() {
         val durationTooSmall = MyConsumer.POLL_TIMEOUT.minusMillis(1);
         val processor = new RecordProcessor<String, String>();
-        val props = Utils.mergeProperties(CONFIG_PATH_PREFIX + App.CLIENT_PROPERTIES,
+        val props = Utils.mergeProperties(CONFIG_PATH_PREFIX + App.CLIENT_CONFLUENT_PROPERTIES,
                 CONFIG_PATH_PREFIX + App.CONSUMER_PROPERTIES);
 
         assertThrows(IllegalArgumentException.class, () -> new MyConsumer(App.TOPIC, props, processor, durationTooSmall));

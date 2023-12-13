@@ -17,7 +17,7 @@ class StreamsAppIT {
 
     @Test
     void consumesStreamedMessage() throws Exception {
-        Properties props = Utils.mergeProperties(CONFIG_PATH_PREFIX + App.CLIENT_PROPERTIES,
+        Properties props = Utils.mergeProperties(CONFIG_PATH_PREFIX + App.CLIENT_CONFLUENT_PROPERTIES,
                 CONFIG_PATH_PREFIX + App.STREAM_PROPERTIES);
         new StreamsApp().stream(props, Duration.ofSeconds(5));
 
