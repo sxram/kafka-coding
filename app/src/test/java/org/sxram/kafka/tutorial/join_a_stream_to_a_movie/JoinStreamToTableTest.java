@@ -70,17 +70,16 @@ class JoinStreamToTableTest {
                                              Deserializer<String> keyDeserializer,
                                              SpecificAvroDeserializer<RatedMovie> makeRatedMovieDeserializer) {
         List<RatedMovie> results = new ArrayList<>();
-        final TestOutputTopic<String, RatedMovie>
-            testOutputTopic =
-            testDriver.createOutputTopic(topic, keyDeserializer, makeRatedMovieDeserializer);
+        final TestOutputTopic<String, RatedMovie> testOutputTopic = testDriver.createOutputTopic(topic,
+                keyDeserializer, makeRatedMovieDeserializer);
         testOutputTopic
-            .readKeyValuesToList()
-            .forEach(record -> {
-                         if (record != null) {
-                             results.add(record.value);
-                         }
-                     }
-            );
+                .readKeyValuesToList()
+                .forEach(record -> {
+                            if (record != null) {
+                                results.add(record.value);
+                            }
+                        }
+                );
         return results;
     }
 
@@ -125,26 +124,34 @@ class JoinStreamToTableTest {
         ratings.add(Rating.newBuilder().setId(780).setRating(2.1).build());
 
         List<RatedMovie> ratedMovies = new ArrayList<>();
-        ratedMovies.add(RatedMovie.newBuilder().setTitle("Die Hard").setId(294).setReleaseYear(1988).setRating(8.2).build());
-        ratedMovies.add(RatedMovie.newBuilder().setTitle("Die Hard").setId(294).setReleaseYear(1988).setRating(8.5).build());
-        ratedMovies.add(RatedMovie.newBuilder().setTitle("Tree of Life").setId(354).setReleaseYear(2011).setRating(9.9).build());
-        ratedMovies.add(RatedMovie.newBuilder().setTitle("Tree of Life").setId(354).setReleaseYear(2011).setRating(9.7).build());
-        ratedMovies.add(RatedMovie.newBuilder().setId(782).setTitle("A Walk in the Clouds").setReleaseYear(1998).setRating(7.8).build());
-        ratedMovies.add(RatedMovie.newBuilder().setId(782).setTitle("A Walk in the Clouds").setReleaseYear(1998).setRating(7.7).build());
-        ratedMovies.add(RatedMovie.newBuilder().setId(128).setTitle("The Big Lebowski").setReleaseYear(1998).setRating(8.7).build());
-        ratedMovies.add(RatedMovie.newBuilder().setId(128).setTitle("The Big Lebowski").setReleaseYear(1998).setRating(8.4).build());
-        ratedMovies.add(RatedMovie.newBuilder().setId(780).setTitle("Super Mario Bros.").setReleaseYear(1993).setRating(2.1).build());
+        ratedMovies.add(RatedMovie.newBuilder().setTitle("Die Hard").setId(294).setReleaseYear(1988).setRating(8.2)
+                .build());
+        ratedMovies.add(RatedMovie.newBuilder().setTitle("Die Hard").setId(294).setReleaseYear(1988).setRating(8.5)
+                .build());
+        ratedMovies.add(RatedMovie.newBuilder().setTitle("Tree of Life").setId(354).setReleaseYear(2011).setRating(9.9)
+                .build());
+        ratedMovies.add(RatedMovie.newBuilder().setTitle("Tree of Life").setId(354).setReleaseYear(2011).setRating(9.7)
+                .build());
+        ratedMovies.add(RatedMovie.newBuilder().setId(782).setTitle("A Walk in the Clouds").setReleaseYear(1998)
+                .setRating(7.8).build());
+        ratedMovies.add(RatedMovie.newBuilder().setId(782).setTitle("A Walk in the Clouds").setReleaseYear(1998)
+                .setRating(7.7).build());
+        ratedMovies.add(RatedMovie.newBuilder().setId(128).setTitle("The Big Lebowski").setReleaseYear(1998)
+                .setRating(8.7).build());
+        ratedMovies.add(RatedMovie.newBuilder().setId(128).setTitle("The Big Lebowski").setReleaseYear(1998)
+                .setRating(8.4).build());
+        ratedMovies.add(RatedMovie.newBuilder().setId(780).setTitle("Super Mario Bros.").setReleaseYear(1993)
+                .setRating(2.1).build());
 
         final TestInputTopic<String, Movie>
-            movieTestInputTopic = testDriver.createInputTopic(tableTopic, keySerializer, movieSerializer);
+                movieTestInputTopic = testDriver.createInputTopic(tableTopic, keySerializer, movieSerializer);
 
         for (Movie movie : movies) {
             movieTestInputTopic.pipeInput(String.valueOf(movie.getId()), movie);
         }
 
-        final TestInputTopic<String, Rating>
-            ratingTestInputTopic =
-            testDriver.createInputTopic(streamTopic, keySerializer, ratingSerializer);
+        final TestInputTopic<String, Rating> ratingTestInputTopic = testDriver.createInputTopic(streamTopic, keySerializer,
+                ratingSerializer);
         for (Rating rating : ratings) {
             ratingTestInputTopic.pipeInput(String.valueOf(rating.getId()), rating);
         }

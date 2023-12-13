@@ -2,6 +2,15 @@
 
 Inspired by [confluent tutorials](https://developer.confluent.io/tutorials).
 
+Tutorials:
+
+* Basic
+  * [creating-first-apache-kafka-producer-application](https://developer.confluent.io/tutorials/creating-first-apache-kafka-producer-application/confluent.html)
+  * [creating-first-apache-kafka-consumer-application](https://developer.confluent.io/tutorials/creating-first-apache-kafka-consumer-application/confluent.html)
+  * [creating-first-apache-kafka-streams-application](https://developer.confluent.io/tutorials/creating-first-apache-kafka-streams-application/confluent.html)
+* Master advanced concepts 
+  * [join-a-stream-to-a-table](https://developer.confluent.io/tutorials/join-a-stream-to-a-table/kstreams.html)
+
 ## Confluent CLI
 
 ### Setup Confluent CLI
