@@ -22,13 +22,13 @@ jobs:
 
       - name: Prepare
         run: |
-          sed -i 's/{{ TODO_SERVER }}/${{ vars.CONFLUENT_SERVER }}/g' $CLIENT_CONFIG
-          sed -i 's/{{ TODO_KEY }}/${{ secrets.CONFLUENT_API_KEY }}/g' $CLIENT_CONFIG
-          sed -i 's/{{ TODO_SECRET }}/${{ secrets.CONFLUENT_API_KEY_SECRET }}/g' $CLIENT_CONFIG
-          sed -i 's/{{ TODO_REGISTRY_SERVER }}/${{ vars.CONFLUENT_SERVER }}/g' $CLIENT_CONFIG
-          sed -i 's/{{ TODO_REGISTRY_KEY }}/${{ secrets.CONFLUENT_API_KEY }}/g' $CLIENT_CONFIG
-          sed -i 's/{{ TODO_REGISTRY_SECRET }}/${{ secrets.CONFLUENT_API_KEY_SECRET }}/g' $CLIENT_CONFIG
-          cat $CLIENT_CONFIG
+          sed -i 's/{{ TODO_SERVER }}/${{ vars.CONFLUENT_SERVER }}/g' ${{ CLIENT_CONFIG }}
+          sed -i 's/{{ TODO_KEY }}/${{ secrets.CONFLUENT_API_KEY }}/g' ${{ CLIENT_CONFIG }}
+          sed -i 's/{{ TODO_SECRET }}/${{ secrets.CONFLUENT_API_KEY_SECRET }}/g' ${{ CLIENT_CONFIG }}
+          sed -i 's/{{ TODO_REGISTRY_SERVER }}/${{ vars.CONFLUENT_SERVER }}/g' ${{ CLIENT_CONFIG }}
+          sed -i 's/{{ TODO_REGISTRY_KEY }}/${{ secrets.CONFLUENT_API_KEY }}/g' ${{ CLIENT_CONFIG }}
+          sed -i 's/{{ TODO_REGISTRY_SECRET }}/${{ secrets.CONFLUENT_API_KEY_SECRET }}/g' ${{ CLIENT_CONFIG }}
+          cat ${{ CLIENT_CONFIG }}
 
       - name: Build
         run: ./gradlew build
