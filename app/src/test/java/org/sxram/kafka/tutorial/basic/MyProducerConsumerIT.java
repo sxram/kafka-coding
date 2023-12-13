@@ -1,5 +1,6 @@
 package org.sxram.kafka.tutorial.basic;
 
+import lombok.val;
 import org.junit.jupiter.api.Test;
 import org.sxram.kafka.tutorial.App;
 import org.sxram.kafka.tutorial.Utils;
@@ -27,7 +28,8 @@ class MyProducerConsumerIT {
                 Utils.mergeProperties(CONFIG_PATH_PREFIX + App.CLIENT_PROPERTIES,
                         CONFIG_PATH_PREFIX + App.CONSUMER_PROPERTIES), handlerMock, Duration.ofSeconds(5)).consume();
 
-        verify(handlerMock, atLeastOnce()).accept(any());
+        val producerInputFile = CONFIG_PATH_PREFIX + App.PRODUCER_INPUT;
+        verify(handlerMock, times((int) Files.lines(Paths.get(producerInputFile)).count())).accept(any());
     }
 
 }
