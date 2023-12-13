@@ -13,6 +13,9 @@ import org.sxram.kafka.tutorial.basic.MyConsumer;
 import java.time.Duration;
 import java.util.Properties;
 
+/**
+ * Test against confluent server.
+ */
 class StreamsAppIT {
 
     @Test
