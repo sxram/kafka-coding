@@ -10,8 +10,10 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout code
       - uses: actions/checkout@v4
 
+      - name: Setup Java
       - uses: actions/setup-java@v3
         with:
           java-version: '17'
@@ -20,7 +22,10 @@ jobs:
       - name: Setup Gradle
         uses: gradle/gradle-build-action@v2
 
-      - name: Prepare
+      - name: Setup Docker
+      - uses: docker-practice/actions-setup-docker@master
+
+      - name: Prepare config file
         run: |
           sed -i 's,{{ TODO_SERVER }},${{ vars.CONFLUENT_SERVER }},g' ${{ env.CLIENT_CONFIG }}
           sed -i 's,{{ TODO_KEY }},${{ secrets.CONFLUENT_API_KEY }},g' ${{ env.CLIENT_CONFIG }}
