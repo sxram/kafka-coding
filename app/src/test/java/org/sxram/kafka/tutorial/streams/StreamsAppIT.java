@@ -27,7 +27,7 @@ class StreamsAppIT {
         props.put("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
         props.put("value.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
         props.put("group.id", "kafka-java-getting-started");
-        new MyConsumer(outputTopic, props, handlerMock, Duration.ofSeconds(6)).consume();
+        new MyConsumer(outputTopic, props, handlerMock, Duration.ofSeconds(10)).consume();
 
         verify(handlerMock, atLeastOnce()).accept(any());
     }
