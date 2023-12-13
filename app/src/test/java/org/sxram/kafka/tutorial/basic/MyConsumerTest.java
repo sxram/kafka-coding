@@ -11,7 +11,6 @@ import org.sxram.kafka.tutorial.App;
 import org.sxram.kafka.tutorial.Utils;
 
 import java.time.Duration;
-import java.util.Collections;
 import java.util.HashMap;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -23,20 +22,23 @@ class MyConsumerTest {
     public static final int PARTITION = 1;
 
     @Test
-    void trowsExceptionWhenPollIntervalTooSmall() {
-        assertThrows(IllegalArgumentException.class, () -> new MyConsumer(App.TOPIC,
-                Utils.mergeProperties(CONFIG_PATH_PREFIX + App.CLIENT_PROPERTIES,
-                        CONFIG_PATH_PREFIX + App.CONSUMER_PROPERTIES), new RecordProcessor<>(), MyConsumer.POLL_TIMEOUT));
+    void throwsExceptionWhenPollIntervalTooSmall() {
+        val durationTooSmall = MyConsumer.POLL_TIMEOUT.minusMillis(1);
+        val processor = new RecordProcessor<String, String>();
+        val props = Utils.mergeProperties(CONFIG_PATH_PREFIX + App.CLIENT_PROPERTIES,
+                CONFIG_PATH_PREFIX + App.CONSUMER_PROPERTIES);
+
+        assertThrows(IllegalArgumentException.class, () -> new MyConsumer(App.TOPIC, props, processor, durationTooSmall));
     }
 
     /**
-     * taken from here: https://www.baeldung.com/kafka-mockconsumer
+     * taken from here: <a href="https://www.baeldung.com/kafka-mockconsumer">https://www.baeldung.com/kafka-mockconsumer</a>
      * error: Cannot add records for a partition that is not assigned to the consumer
      * java.lang.IllegalStateException: Cannot add records for a partition that is not assigned to the consumer
      * 	at org.apache.kafka.clients.consumer.MockConsumer.addRecord(MockConsumer.java:232)
      */
     @Test
-    @Disabled
+    @Disabled("adding record fails with exception")
     void consumes() {
         final MockConsumer<String, String> mockConsumer = new MockConsumer<>(OffsetResetStrategy.EARLIEST);
         final RecordProcessor<String, String> processor = new RecordProcessor<>();
