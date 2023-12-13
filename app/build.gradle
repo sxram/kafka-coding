@@ -92,3 +92,11 @@ shadowJar {
 application {
     getMainClass().set(javaMainClass)
 }
+
+test {
+    testLogging {
+        outputs.upToDateWhen { false }
+        showStandardStreams = true
+        exceptionFormat = 'full'
+    }
+}
