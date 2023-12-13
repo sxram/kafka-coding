@@ -17,7 +17,7 @@ public class App {
     public static final String TOPIC = "my-topic";
     public static final String PRODUCER_INPUT = "producer_input.txt";
 
-    public static final String CLIENT_PROPERTIES = "client_confluent.properties";
+    public static final String CLIENT_CONFLUENT_PROPERTIES = "client_confluent.properties";
     // public static final String CLIENT_LOCAL_PROPERTIES = "client_local.properties";
     public static final String CONSUMER_PROPERTIES = "consumer.properties";
     public static final String PRODUCER_PROPERTIES = "producer.properties";
@@ -37,17 +37,17 @@ public class App {
     public static void runProducerConsumer(final String configPathPrefix) throws IOException {
         log.info("### Starting Producer/Consumer");
         new MyProducer(TOPIC,
-                Utils.mergeProperties(configPathPrefix + CLIENT_PROPERTIES, configPathPrefix + PRODUCER_PROPERTIES))
+                Utils.mergeProperties(configPathPrefix + CLIENT_CONFLUENT_PROPERTIES, configPathPrefix + PRODUCER_PROPERTIES))
                 .produce(Files.readAllLines(Paths.get(configPathPrefix + PRODUCER_INPUT)));
         new MyConsumer(TOPIC,
-                Utils.mergeProperties(configPathPrefix + CLIENT_PROPERTIES, configPathPrefix + CONSUMER_PROPERTIES),
+                Utils.mergeProperties(configPathPrefix + CLIENT_CONFLUENT_PROPERTIES, configPathPrefix + CONSUMER_PROPERTIES),
                 new RecordProcessor<>(), Duration.ofSeconds(3))
                 .consume();
     }
 
     public static void runStreamsApp(final String configPathPrefix) throws Exception {
         log.info("### Starting Streams");
-        new StreamsApp().stream(Utils.mergeProperties(configPathPrefix + CLIENT_PROPERTIES,
+        new StreamsApp().stream(Utils.mergeProperties(configPathPrefix + CLIENT_CONFLUENT_PROPERTIES,
                 configPathPrefix + STREAM_PROPERTIES), Duration.ofSeconds(5));
     }
 

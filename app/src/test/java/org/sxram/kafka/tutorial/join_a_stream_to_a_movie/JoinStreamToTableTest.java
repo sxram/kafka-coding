@@ -37,22 +37,20 @@ class JoinStreamToTableTest {
 
     private SpecificAvroSerializer<Movie> makeMovieSerializer(Properties allProps) {
         SpecificAvroSerializer<Movie> serializer = new SpecificAvroSerializer<>();
-
-        Map<String, String> config = new HashMap<>();
-        config.put("schema.registry.url", allProps.getProperty("schema.registry.url"));
-        serializer.configure(config, false);
-
+        configureSerializer(allProps, serializer);
         return serializer;
     }
 
     private SpecificAvroSerializer<Rating> makeRatingSerializer(Properties allProps) {
         SpecificAvroSerializer<Rating> serializer = new SpecificAvroSerializer<>();
+        configureSerializer(allProps, serializer);
+        return serializer;
+    }
 
+    private static void configureSerializer(Properties allProps, SpecificAvroSerializer<?> serializer) {
         Map<String, String> config = new HashMap<>();
         config.put("schema.registry.url", allProps.getProperty("schema.registry.url"));
         serializer.configure(config, false);
-
-        return serializer;
     }
 
     private SpecificAvroDeserializer<RatedMovie> makeRatedMovieDeserializer(Properties allProps) {
@@ -68,10 +66,11 @@ class JoinStreamToTableTest {
     private List<RatedMovie> readOutputTopic(TopologyTestDriver testDriver,
                                              String topic,
                                              Deserializer<String> keyDeserializer,
-                                             SpecificAvroDeserializer<RatedMovie> makeRatedMovieDeserializer) {
+                                             SpecificAvroDeserializer<RatedMovie> ratedMovieDeserializer) {
         List<RatedMovie> results = new ArrayList<>();
-        final TestOutputTopic<String, RatedMovie> testOutputTopic = testDriver.createOutputTopic(topic,
-                keyDeserializer, makeRatedMovieDeserializer);
+        final TestOutputTopic<String, RatedMovie> testOutputTopic = testDriver.createOutputTopic(topic, keyDeserializer,
+                ratedMovieDeserializer);
+
         testOutputTopic
                 .readKeyValuesToList()
                 .forEach(record -> {
@@ -80,6 +79,7 @@ class JoinStreamToTableTest {
                             }
                         }
                 );
+
         return results;
     }
 
@@ -123,24 +123,24 @@ class JoinStreamToTableTest {
         ratings.add(Rating.newBuilder().setId(128).setRating(8.4).build());
         ratings.add(Rating.newBuilder().setId(780).setRating(2.1).build());
 
-        List<RatedMovie> ratedMovies = new ArrayList<>();
-        ratedMovies.add(RatedMovie.newBuilder().setTitle("Die Hard").setId(294).setReleaseYear(1988).setRating(8.2)
+        List<RatedMovie> expectedRatedMovies = new ArrayList<>();
+        expectedRatedMovies.add(RatedMovie.newBuilder().setTitle("Die Hard").setId(294).setReleaseYear(1988).setRating(8.2)
                 .build());
-        ratedMovies.add(RatedMovie.newBuilder().setTitle("Die Hard").setId(294).setReleaseYear(1988).setRating(8.5)
+        expectedRatedMovies.add(RatedMovie.newBuilder().setTitle("Die Hard").setId(294).setReleaseYear(1988).setRating(8.5)
                 .build());
-        ratedMovies.add(RatedMovie.newBuilder().setTitle("Tree of Life").setId(354).setReleaseYear(2011).setRating(9.9)
+        expectedRatedMovies.add(RatedMovie.newBuilder().setTitle("Tree of Life").setId(354).setReleaseYear(2011).setRating(9.9)
                 .build());
-        ratedMovies.add(RatedMovie.newBuilder().setTitle("Tree of Life").setId(354).setReleaseYear(2011).setRating(9.7)
+        expectedRatedMovies.add(RatedMovie.newBuilder().setTitle("Tree of Life").setId(354).setReleaseYear(2011).setRating(9.7)
                 .build());
-        ratedMovies.add(RatedMovie.newBuilder().setId(782).setTitle("A Walk in the Clouds").setReleaseYear(1998)
+        expectedRatedMovies.add(RatedMovie.newBuilder().setId(782).setTitle("A Walk in the Clouds").setReleaseYear(1998)
                 .setRating(7.8).build());
-        ratedMovies.add(RatedMovie.newBuilder().setId(782).setTitle("A Walk in the Clouds").setReleaseYear(1998)
+        expectedRatedMovies.add(RatedMovie.newBuilder().setId(782).setTitle("A Walk in the Clouds").setReleaseYear(1998)
                 .setRating(7.7).build());
-        ratedMovies.add(RatedMovie.newBuilder().setId(128).setTitle("The Big Lebowski").setReleaseYear(1998)
+        expectedRatedMovies.add(RatedMovie.newBuilder().setId(128).setTitle("The Big Lebowski").setReleaseYear(1998)
                 .setRating(8.7).build());
-        ratedMovies.add(RatedMovie.newBuilder().setId(128).setTitle("The Big Lebowski").setReleaseYear(1998)
+        expectedRatedMovies.add(RatedMovie.newBuilder().setId(128).setTitle("The Big Lebowski").setReleaseYear(1998)
                 .setRating(8.4).build());
-        ratedMovies.add(RatedMovie.newBuilder().setId(780).setTitle("Super Mario Bros.").setReleaseYear(1993)
+        expectedRatedMovies.add(RatedMovie.newBuilder().setId(780).setTitle("Super Mario Bros.").setReleaseYear(1993)
                 .setRating(2.1).build());
 
         final TestInputTopic<String, Movie>
@@ -158,7 +158,7 @@ class JoinStreamToTableTest {
 
         List<RatedMovie> actualOutput = readOutputTopic(testDriver, outputTopic, stringDeserializer, valueDeserializer);
 
-        assertEquals(ratedMovies, actualOutput);
+        assertEquals(expectedRatedMovies, actualOutput);
     }
 
     @AfterEach
