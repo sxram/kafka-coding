@@ -1,15 +1,14 @@
 package org.sxram.kafka.tutorial.basic;
 
-import lombok.extern.slf4j.Slf4j;
 import lombok.val;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.rnorth.ducttape.unreliables.Unreliables;
 import org.sxram.kafka.tutorial.App;
 import org.sxram.kafka.tutorial.Utils;
 import org.testcontainers.containers.KafkaContainer;
 import org.testcontainers.containers.Network;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 
 import java.io.IOException;
@@ -25,17 +24,13 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.sxram.kafka.tutorial.TestUtils.CONFIG_PATH_PREFIX;
 
+@Testcontainers
 class MyProducerConsumerLocalContainerIT {
 
     private static final DockerImageName KAFKA_KRAFT_TEST_IMAGE = DockerImageName.parse("confluentinc/cp-kafka:7.4.1");
 
-    private static KafkaContainer kafkaContainer;
-
-    @BeforeAll
-    static void containerSetup() {
-        kafkaContainer = new KafkaContainer(KAFKA_KRAFT_TEST_IMAGE).withNetwork(Network.SHARED);
-        kafkaContainer.start();
-    }
+    @Container
+    private static final KafkaContainer kafkaContainer = new KafkaContainer(KAFKA_KRAFT_TEST_IMAGE).withNetwork(Network.SHARED);
 
     @Test
     void consumesProducedMessage() throws IOException {
@@ -79,11 +74,6 @@ class MyProducerConsumerLocalContainerIT {
             });
         }
 
-    }
-
-    @AfterAll
-    static void shutdown() {
-        kafkaContainer.stop();
     }
 
 }
