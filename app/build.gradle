@@ -55,7 +55,7 @@ dependencies {
 
     implementation "org.apache.avro:avro:1.11.3"
     // !!! 3.6.0 will break the test
-    implementation 'org.apache.kafka:kafka-streams:3.5.1'
+    implementation 'org.apache.kafka:kafka-streams:6.2.13-ce'
     implementation ('org.apache.kafka:kafka-clients') {
         version {
             strictly '3.5.1'
