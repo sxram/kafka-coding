@@ -30,9 +30,12 @@ confluent kafka topic produce <topic> --value-format avro --schema orders-avro-s
 
 # Testing
 
+* [Kafka Stream Examples](https://github.com/confluentinc/kafka-streams-examples)
+
 * [Streams - Unit Tests](https://www.confluent.io/blog/stream-processing-part-2-testing-your-streaming-application/?session_ref=https://www.google.com/)
   * [TestDriver](https://www.confluent.io/de-de/blog/test-kafka-streams-with-topologytestdriver/)
 * Stream - Integration Tests
-  * EmbeddedKafkaCluster
+  * [EmbeddedKafkaCluster](https://mguenther.github.io/kafka-junit/)
     * [Example ITs](https://github.com/apache/kafka/tree/trunk/streams/src/test/java/org/apache/kafka/streams/integration)
+    * EmbeddedSingleNodeKafkaCluster: also provides a Confluent Schema Registry instance
   * [Test Docker Container](https://java.testcontainers.org/modules/kafka/)
