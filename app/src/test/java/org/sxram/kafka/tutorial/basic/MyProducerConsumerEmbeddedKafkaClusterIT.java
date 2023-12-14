@@ -1,14 +1,12 @@
 package org.sxram.kafka.tutorial.basic;
 
 import lombok.val;
+import net.mguenther.kafka.junit.EmbeddedKafkaCluster;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.rnorth.ducttape.unreliables.Unreliables;
 import org.sxram.kafka.tutorial.App;
-import org.testcontainers.containers.KafkaContainer;
-import org.testcontainers.containers.Network;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
-import org.testcontainers.utility.DockerImageName;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -17,6 +15,10 @@ import java.nio.file.Paths;
 import java.time.Duration;
 import java.util.concurrent.TimeUnit;
 
+import static net.mguenther.kafka.junit.EmbeddedKafkaCluster.provisionWith;
+import static net.mguenther.kafka.junit.EmbeddedKafkaClusterConfig.defaultClusterConfig;
+import static net.mguenther.kafka.junit.ObserveKeyValues.on;
+import static net.mguenther.kafka.junit.SendValues.to;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.spy;
@@ -24,22 +26,35 @@ import static org.mockito.Mockito.verify;
 import static org.sxram.kafka.tutorial.TestUtils.CONFIG_PATH_PREFIX;
 import static org.sxram.kafka.tutorial.TestUtils.createProps;
 
-@Testcontainers
-class MyProducerConsumerWithTestContainerIT {
+class MyProducerConsumerEmbeddedKafkaClusterIT {
 
-    private static final DockerImageName KAFKA_KRAFT_TEST_IMAGE = DockerImageName.parse("confluentinc/cp-kafka:7.4.1");
+    private EmbeddedKafkaCluster kafka;
 
-    @Container
-    private static final KafkaContainer kafkaContainer = new KafkaContainer(KAFKA_KRAFT_TEST_IMAGE).withNetwork(Network.SHARED);
+    @BeforeEach
+    void setupKafka() {
+        kafka = provisionWith(defaultClusterConfig());
+        kafka.start();
+    }
+
+    @AfterEach
+    void tearDownKafka() {
+        kafka.stop();
+    }
+
+    @Test
+    void shouldWaitForRecordsToBePublished() throws Exception {
+        kafka.send(to("test-topic", "a", "b", "c"));
+        kafka.observe(on("test-topic", 3));
+    }
 
     @Test
     void consumesProducedMessages() throws IOException {
         RecordProcessor<String, String> handlerMock = spy(new RecordProcessor<>());
 
         val producerProps = createProps(App.PRODUCER_PROPERTIES);
-        producerProps.put("bootstrap.servers", kafkaContainer.getBootstrapServers());
+        producerProps.put("bootstrap.servers", getBootstrapServers());
         val consumerProps = createProps(App.CONSUMER_PROPERTIES);
-        consumerProps.put("bootstrap.servers", kafkaContainer.getBootstrapServers());
+        consumerProps.put("bootstrap.servers", getBootstrapServers());
 
         Path producerConfigPath = Paths.get(CONFIG_PATH_PREFIX + App.PRODUCER_INPUT);
         new MyProducer(App.TOPIC, producerProps).produce(Files.readAllLines(producerConfigPath));
@@ -58,9 +73,9 @@ class MyProducerConsumerWithTestContainerIT {
         RecordProcessor<String, String> handlerMock = spy(new RecordProcessor<>());
 
         val producerProps = createProps(App.PRODUCER_PROPERTIES);
-        producerProps.put("bootstrap.servers", kafkaContainer.getBootstrapServers());
+        producerProps.put("bootstrap.servers", getBootstrapServers());
         val consumerProps = createProps(App.CONSUMER_PROPERTIES);
-        consumerProps.put("bootstrap.servers", kafkaContainer.getBootstrapServers());
+        consumerProps.put("bootstrap.servers", getBootstrapServers());
 
         Path producerConfigPath = Paths.get(CONFIG_PATH_PREFIX + App.PRODUCER_INPUT);
         new MyProducer(App.TOPIC, producerProps).produce(Files.readAllLines(producerConfigPath));
@@ -77,9 +92,9 @@ class MyProducerConsumerWithTestContainerIT {
         RecordProcessor<String, String> recordProcessor = new RecordProcessor<>();
 
         val producerProps = createProps(App.PRODUCER_PROPERTIES);
-        producerProps.put("bootstrap.servers", kafkaContainer.getBootstrapServers());
+        producerProps.put("bootstrap.servers", getBootstrapServers());
         val consumerProps = createProps(App.CONSUMER_PROPERTIES);
-        consumerProps.put("bootstrap.servers", kafkaContainer.getBootstrapServers());
+        consumerProps.put("bootstrap.servers", getBootstrapServers());
 
         Path producerConfigPath = Paths.get(CONFIG_PATH_PREFIX + App.PRODUCER_INPUT);
         new MyProducer(App.TOPIC, producerProps).produce(Files.readAllLines(producerConfigPath));
@@ -94,6 +109,10 @@ class MyProducerConsumerWithTestContainerIT {
                 return recordProcessor.getRecords().size() >= linesCountProduced;
             });
         }
+    }
+
+    private String getBootstrapServers() {
+        return kafka.getBrokerList();
     }
 
 }

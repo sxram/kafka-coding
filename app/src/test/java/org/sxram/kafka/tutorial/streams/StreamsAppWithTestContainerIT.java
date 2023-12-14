@@ -4,7 +4,6 @@ import lombok.val;
 import org.junit.jupiter.api.Test;
 import org.rnorth.ducttape.unreliables.Unreliables;
 import org.sxram.kafka.tutorial.App;
-import org.sxram.kafka.tutorial.Utils;
 import org.sxram.kafka.tutorial.basic.MyConsumer;
 import org.sxram.kafka.tutorial.basic.RecordProcessor;
 import org.testcontainers.containers.KafkaContainer;
@@ -17,7 +16,6 @@ import java.time.Duration;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
-import static org.sxram.kafka.tutorial.TestUtils.CONFIG_PATH_PREFIX;
 import static org.sxram.kafka.tutorial.TestUtils.createProps;
 
 /**

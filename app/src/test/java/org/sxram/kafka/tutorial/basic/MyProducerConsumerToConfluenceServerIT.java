@@ -5,7 +5,6 @@ import lombok.val;
 import org.junit.jupiter.api.Test;
 import org.rnorth.ducttape.unreliables.Unreliables;
 import org.sxram.kafka.tutorial.App;
-import org.sxram.kafka.tutorial.Utils;
 
 import java.io.IOException;
 import java.nio.file.Files;

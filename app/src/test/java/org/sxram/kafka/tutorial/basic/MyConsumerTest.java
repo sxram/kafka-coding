@@ -8,14 +8,12 @@ import org.apache.kafka.common.TopicPartition;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.sxram.kafka.tutorial.App;
-import org.sxram.kafka.tutorial.Utils;
 
 import java.time.Duration;
 import java.util.HashMap;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.sxram.kafka.tutorial.TestUtils.CONFIG_PATH_PREFIX;
 import static org.sxram.kafka.tutorial.TestUtils.createConfluentProps;
 
 class MyConsumerTest {
@@ -28,9 +26,7 @@ class MyConsumerTest {
         val props = createConfluentProps(App.CONSUMER_PROPERTIES);
 
         try (MyConsumer consumer = new MyConsumer(App.TOPIC, props, new RecordProcessor<>())) {
-            assertThrows(IllegalArgumentException.class, () -> {
-                consumer.consume(durationTooSmall);
-            });
+            assertThrows(IllegalArgumentException.class, () -> consumer.consume(durationTooSmall));
         }
     }
 
