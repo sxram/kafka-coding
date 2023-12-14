@@ -19,11 +19,9 @@ public class MyConsumer implements AutoCloseable {
     static final Duration POLL_TIMEOUT = Duration.ofMillis(500);
 
     private final Consumer<String, String> consumer;
-    private final String topic;
     private final RecordProcessor<String, String> handler;
 
     public MyConsumer(final String topic, final Properties properties, RecordProcessor<String, String> handler) {
-        this.topic = topic;
         this.handler = handler;
         properties.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, CONSUME_OFFSET);
         this.consumer = new KafkaConsumer<>(properties);
@@ -32,7 +30,6 @@ public class MyConsumer implements AutoCloseable {
     }
 
     public MyConsumer(final String topic, final Consumer<String, String> consumer, RecordProcessor<String, String> handler) {
-        this.topic = topic;
         this.handler = handler;
         this.consumer = consumer;
 
@@ -47,6 +44,7 @@ public class MyConsumer implements AutoCloseable {
         if (pollingDuration.compareTo(POLL_TIMEOUT) < 0) {
             throw new IllegalArgumentException("Polling duration too small (<" + POLL_TIMEOUT + ")");
         }
+
         try {
             long duration = 0;
             while (duration < pollingDuration.toMillis()) {

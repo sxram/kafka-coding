@@ -4,6 +4,7 @@ import lombok.val;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.rnorth.ducttape.unreliables.Unreliables;
 import org.sxram.kafka.tutorial.App;
 import org.sxram.kafka.tutorial.Utils;
 import org.testcontainers.containers.KafkaContainer;
@@ -15,10 +16,11 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Duration;
+import java.util.concurrent.TimeUnit;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.sxram.kafka.tutorial.TestUtils.CONFIG_PATH_PREFIX;
 
@@ -44,11 +46,36 @@ class MyProducerConsumerLocalContainerIT {
         consumerProps.put("bootstrap.servers", kafkaContainer.getBootstrapServers());
 
         new MyProducer(App.TOPIC, producerProps).produce(Files.readAllLines(producerConfigPath));
-        new MyConsumer(App.TOPIC, consumerProps, handlerMock).consume(Duration.ofSeconds(5));
+
+        try (val consumer = new MyConsumer(App.TOPIC, consumerProps, handlerMock)) {
+            consumer.consume(Duration.ofSeconds(5));
+        }
 
         try (val lines = Files.lines(producerConfigPath)) {
-            verify(handlerMock, times((int) lines.count())).accept(any());
+            verify(handlerMock, atLeast((int) lines.count())).accept(any());
         }
+    }
+
+    @Test
+    void pollsProducedMessage() throws IOException {
+        RecordProcessor<String, String> handlerMock = spy(new RecordProcessor<>());
+        Path producerConfigPath = Paths.get(CONFIG_PATH_PREFIX + App.PRODUCER_INPUT);
+        val producerProps = Utils.mergeProperties(CONFIG_PATH_PREFIX + App.PRODUCER_PROPERTIES);
+        producerProps.put("bootstrap.servers", kafkaContainer.getBootstrapServers());
+        val consumerProps = Utils.mergeProperties(CONFIG_PATH_PREFIX + App.CONSUMER_PROPERTIES);
+        consumerProps.put("bootstrap.servers", kafkaContainer.getBootstrapServers());
+
+        new MyProducer(App.TOPIC, producerProps).produce(Files.readAllLines(producerConfigPath));
+
+        try (val consumer = new MyConsumer(App.TOPIC, consumerProps, handlerMock);
+             val lines = Files.lines(producerConfigPath)) {
+
+            Unreliables.retryUntilTrue(10, TimeUnit.SECONDS, () -> {
+                consumer.poll();
+                return handlerMock.getRecords().size() >= lines.count();
+            });
+        }
+
     }
 
     @AfterAll
