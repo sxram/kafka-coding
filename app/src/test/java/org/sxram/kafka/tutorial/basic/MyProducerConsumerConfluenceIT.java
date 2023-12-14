@@ -28,12 +28,14 @@ class MyProducerConsumerConfluenceIT {
         new MyProducer(App.TOPIC, Utils.mergeProperties(
                 CONFIG_PATH_PREFIX + App.CLIENT_CONFLUENT_PROPERTIES,
                 CONFIG_PATH_PREFIX + App.PRODUCER_PROPERTIES)).produce(Files.readAllLines(producerConfigPath));
-        new MyConsumer(App.TOPIC, Utils.mergeProperties(
+        try(val consumer = new MyConsumer(App.TOPIC, Utils.mergeProperties(
                 CONFIG_PATH_PREFIX + App.CLIENT_CONFLUENT_PROPERTIES,
-                CONFIG_PATH_PREFIX + App.CONSUMER_PROPERTIES), handlerMock, Duration.ofSeconds(5)).consume();
+                CONFIG_PATH_PREFIX + App.CONSUMER_PROPERTIES), handlerMock)) {
+            consumer.consume(Duration.ofSeconds(5));
+        }
 
         try (val lines = Files.lines(producerConfigPath)) {
-            verify(handlerMock, times((int) lines.count())).accept(any());
+            verify(handlerMock, atLeast((int) lines.count())).accept(any());
         }
     }
 

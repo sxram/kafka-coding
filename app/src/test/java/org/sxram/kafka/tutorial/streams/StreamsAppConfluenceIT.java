@@ -1,17 +1,20 @@
 package org.sxram.kafka.tutorial.streams;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
-import static org.sxram.kafka.tutorial.TestUtils.CONFIG_PATH_PREFIX;
-
+import lombok.val;
 import org.junit.jupiter.api.Test;
 import org.sxram.kafka.tutorial.App;
 import org.sxram.kafka.tutorial.Utils;
-import org.sxram.kafka.tutorial.basic.RecordProcessor;
 import org.sxram.kafka.tutorial.basic.MyConsumer;
+import org.sxram.kafka.tutorial.basic.RecordProcessor;
 
 import java.time.Duration;
 import java.util.Properties;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
+import static org.sxram.kafka.tutorial.TestUtils.CONFIG_PATH_PREFIX;
 
 /**
  * Test against confluent server.
@@ -30,8 +33,9 @@ class StreamsAppConfluenceIT {
         props.put("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
         props.put("value.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
         props.put("group.id", "kafka-java-getting-started");
-        new MyConsumer(outputTopic, props, handlerMock, Duration.ofSeconds(10)).consume();
-
+        try (val consumer = new MyConsumer(outputTopic, props, handlerMock)) {
+            consumer.consume(Duration.ofSeconds(10));
+        }
         verify(handlerMock, atLeastOnce()).accept(any());
     }
 

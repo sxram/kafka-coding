@@ -1,6 +1,7 @@
 package org.sxram.kafka.tutorial;
 
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 import org.sxram.kafka.tutorial.basic.RecordProcessor;
 import org.sxram.kafka.tutorial.basic.MyConsumer;
 import org.sxram.kafka.tutorial.basic.MyProducer;
@@ -39,10 +40,11 @@ public class App {
         new MyProducer(TOPIC,
                 Utils.mergeProperties(configPathPrefix + CLIENT_CONFLUENT_PROPERTIES, configPathPrefix + PRODUCER_PROPERTIES))
                 .produce(Files.readAllLines(Paths.get(configPathPrefix + PRODUCER_INPUT)));
-        new MyConsumer(TOPIC,
+        try (MyConsumer consumer = new MyConsumer(TOPIC,
                 Utils.mergeProperties(configPathPrefix + CLIENT_CONFLUENT_PROPERTIES, configPathPrefix + CONSUMER_PROPERTIES),
-                new RecordProcessor<>(), Duration.ofSeconds(3))
-                .consume();
+                new RecordProcessor<>());) {
+            consumer.consume(Duration.ofSeconds(3));
+        }
     }
 
     public static void runStreamsApp(final String configPathPrefix) throws Exception {

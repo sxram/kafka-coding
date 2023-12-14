@@ -44,7 +44,7 @@ class MyProducerConsumerLocalContainerIT {
         consumerProps.put("bootstrap.servers", kafkaContainer.getBootstrapServers());
 
         new MyProducer(App.TOPIC, producerProps).produce(Files.readAllLines(producerConfigPath));
-        new MyConsumer(App.TOPIC, consumerProps, handlerMock, Duration.ofSeconds(5)).consume();
+        new MyConsumer(App.TOPIC, consumerProps, handlerMock).consume(Duration.ofSeconds(5));
 
         try (val lines = Files.lines(producerConfigPath)) {
             verify(handlerMock, times((int) lines.count())).accept(any());
