@@ -8,27 +8,21 @@ import org.apache.kafka.streams.TestOutputTopic;
 import org.apache.kafka.streams.Topology;
 import org.apache.kafka.streams.TopologyTestDriver;
 import org.junit.jupiter.api.Test;
-import org.sxram.kafka.tutorial.Utils;
 
-import java.io.IOException;
 import java.util.Arrays;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 class StreamsAppTest {
 
-    private final static String TEST_CONFIG_FILE = "../config/test_stream.properties";
-
     @Test
-    void topologyShouldUpperCaseInputs() throws IOException {
-        val props = Utils.loadConfig(TEST_CONFIG_FILE);
-
-        val inputTopicName = props.getProperty("input.topic.name");
-        val outputTopicName = props.getProperty("output.topic.name");
+    void topologyShouldUpperCaseInputs() {
+        val inputTopicName = "random-strings";
+        val outputTopicName = "tall-random-strings";
 
         final Topology topology = StreamsApp.buildTopology(inputTopicName, outputTopicName);
 
-        try (final TopologyTestDriver testDriver = new TopologyTestDriver(topology, props);
+        try (final TopologyTestDriver testDriver = new TopologyTestDriver(topology);
              final Serde<String> stringSerde = Serdes.String()) {
 
             final TestInputTopic<String, String> inputTopic = testDriver
