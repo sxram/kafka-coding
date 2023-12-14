@@ -22,21 +22,15 @@ class MyConsumerTest {
 
     @Test
     void throwsExceptionWhenPollIntervalTooSmall() {
-        val durationTooSmall = MyConsumer.POLL_TIMEOUT.minusMillis(1);
-        val props = createConfluentProps(App.CONSUMER_PROPERTIES);
-
-        try (MyConsumer consumer = new MyConsumer(App.TOPIC, props, new RecordProcessor<>())) {
-            assertThrows(IllegalArgumentException.class, () -> consumer.consume(durationTooSmall));
+        try (MyConsumer consumer = new MyConsumer(App.TOPIC, createConfluentProps(App.CONSUMER_PROPERTIES), new RecordProcessor<>())) {
+            assertThrows(IllegalArgumentException.class, () -> consumer.consume(MyConsumer.POLL_TIMEOUT.minusMillis(1)));
         }
     }
 
     @Test
     void consumes() {
-        val durationEqualMin = MyConsumer.POLL_TIMEOUT;
-        val props = createConfluentProps(App.CONSUMER_PROPERTIES);
-
-        try (MyConsumer consumer = new MyConsumer(App.TOPIC, props, new RecordProcessor<>())) {
-            consumer.consume(durationEqualMin);
+        try (MyConsumer consumer = new MyConsumer(App.TOPIC, createConfluentProps(App.CONSUMER_PROPERTIES), new RecordProcessor<>())) {
+            consumer.consume(MyConsumer.POLL_TIMEOUT);
         }
     }
 
