@@ -50,9 +50,7 @@ public class MyConsumer implements AutoCloseable {
      * @param pollingDuration polling duration
      */
     public void consume(final Duration pollingDuration) {
-        if (pollingDuration.compareTo(POLL_TIMEOUT) < 0) {
-            throw new IllegalArgumentException("Polling duration too small (<" + POLL_TIMEOUT + ")");
-        }
+        verifyDuration(pollingDuration);
 
         try {
             long duration = 0;
@@ -67,10 +65,29 @@ public class MyConsumer implements AutoCloseable {
         }
     }
 
-    public void consumeWithParallelProcessing(final Duration pollingDuration) {
+    public void poll() {
+        ConsumerRecords<String, String> records = consumer.poll(POLL_TIMEOUT);
+
+        log.debug("Polled " + records.count() + " records");
+
+        StreamSupport.stream(records.spliterator(), false)
+                .forEach(handler);
+        consumer.commitSync();
+    }
+
+
+    private static void verifyDuration(Duration pollingDuration) {
         if (pollingDuration.compareTo(POLL_TIMEOUT) < 0) {
             throw new IllegalArgumentException("Polling duration too small (<" + POLL_TIMEOUT + ")");
         }
+    }
+
+    /**
+     * blocks for a duration of <code>pollingDuration</code>
+     * @param pollingDuration polling duration
+     */
+    public void consumeWithParallelProcessing(final Duration pollingDuration) {
+        verifyDuration(pollingDuration);
 
         List<ConsumerRecord<String, String>> records = new ArrayList<>();
 
@@ -78,8 +95,9 @@ public class MyConsumer implements AutoCloseable {
             long duration = 0;
             while (duration < pollingDuration.toMillis()) {
                 duration = duration + POLL_TIMEOUT.toMillis();
-                log.debug("Polling ...");
+
                 ConsumerRecords<String, String> batchRecords = consumer.poll(POLL_TIMEOUT);
+                log.debug("Polled " + batchRecords.count()  + " records");
 
                 for (ConsumerRecord<String, String> batchRecord : batchRecords) {
                     records.add(batchRecord);
@@ -124,14 +142,6 @@ public class MyConsumer implements AutoCloseable {
 
     public void close() {
         consumer.close();
-    }
-
-    public void poll() {
-        log.debug("Polling ...");
-        ConsumerRecords<String, String> records = consumer.poll(POLL_TIMEOUT);
-        StreamSupport.stream(records.spliterator(), false)
-                .forEach(handler);
-        consumer.commitSync();
     }
 
 }

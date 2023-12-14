@@ -67,9 +67,7 @@ class MyProducerConsumerTestContainerIT {
             consumer.consumeWithParallelProcessing(Duration.ofSeconds(5));
         }
 
-        //try (val lines = Files.lines(producerConfigPath).filter(l -> !l.trim().isEmpty())) {
-            verify(handlerMock, atLeast(MyConsumer.PARALLEL_PROCESSING_BATCH_SIZE)).accept(any());
-        //}
+        verify(handlerMock, atLeast(MyConsumer.PARALLEL_PROCESSING_BATCH_SIZE)).accept(any());
     }
 
     @Test
