@@ -18,7 +18,7 @@ import static org.sxram.kafka.tutorial.TestUtils.CONFIG_PATH_PREFIX;
  * Test against confluent server.
  */
 @Slf4j
-class MyProducerConsumerConfluenceIT {
+class MyProducerConsumerToConfluenceServerIT {
 
     @Test
     void pollProducedMessages() throws IOException {

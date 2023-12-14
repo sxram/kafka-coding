@@ -25,7 +25,7 @@ import static org.mockito.Mockito.verify;
 import static org.sxram.kafka.tutorial.TestUtils.CONFIG_PATH_PREFIX;
 
 @Testcontainers
-class MyProducerConsumerTestContainerIT {
+class MyProducerConsumerWithTestContainerIT {
 
     private static final DockerImageName KAFKA_KRAFT_TEST_IMAGE = DockerImageName.parse("confluentinc/cp-kafka:7.4.1");
 

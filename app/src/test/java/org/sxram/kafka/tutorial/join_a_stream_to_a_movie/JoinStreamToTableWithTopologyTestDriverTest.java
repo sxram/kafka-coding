@@ -30,7 +30,7 @@ import static org.sxram.kafka.tutorial.TestUtils.CONFIG_PATH_PREFIX;
 /**
  * <a href="https://developer.confluent.io/tutorials/join-a-stream-to-a-table/kstreams.html">https://developer.confluent.io/tutorials/join-a-stream-to-a-table/kstreams.html</a>
  */
-class JoinStreamToTableTest {
+class JoinStreamToTableWithTopologyTestDriverTest {
 
     private static final String MOCK_SCHEMA_REGISTRY = "mock://localhost:8081";
     private static final String PROPERTY_SCHEMA_REGISTRY_URL = "schema.registry.url";
