@@ -18,6 +18,7 @@ import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
 import static org.sxram.kafka.tutorial.TestUtils.CONFIG_PATH_PREFIX;
+import static org.sxram.kafka.tutorial.TestUtils.createProps;
 
 /**
  * Test against confluent server.
@@ -34,7 +35,7 @@ class StreamsAppWithTestContainerIT {
 
     @Test
     void consumesStreamedMessage() throws Exception {
-        Properties props = Utils.mergeProperties(CONFIG_PATH_PREFIX + App.STREAM_PROPERTIES);
+        Properties props = createProps(App.STREAM_PROPERTIES);
         props.put("bootstrap.servers", kafkaContainer.getBootstrapServers());
         props.put("schema.registry.url", MOCK_SCHEMA_REGISTRY);
 

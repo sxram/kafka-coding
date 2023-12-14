@@ -16,6 +16,7 @@ import java.util.HashMap;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.sxram.kafka.tutorial.TestUtils.CONFIG_PATH_PREFIX;
+import static org.sxram.kafka.tutorial.TestUtils.createConfluentProps;
 
 class MyConsumerTest {
 
@@ -24,8 +25,7 @@ class MyConsumerTest {
     @Test
     void throwsExceptionWhenPollIntervalTooSmall() {
         val durationTooSmall = MyConsumer.POLL_TIMEOUT.minusMillis(1);
-        val props = Utils.mergeProperties(CONFIG_PATH_PREFIX + App.CLIENT_CONFLUENT_PROPERTIES,
-                CONFIG_PATH_PREFIX + App.CONSUMER_PROPERTIES);
+        val props = createConfluentProps(App.CONSUMER_PROPERTIES);
 
         try (MyConsumer consumer = new MyConsumer(App.TOPIC, props, new RecordProcessor<>())) {
             assertThrows(IllegalArgumentException.class, () -> {
@@ -37,8 +37,7 @@ class MyConsumerTest {
     @Test
     void consumes() {
         val durationEqualMin = MyConsumer.POLL_TIMEOUT;
-        val props = Utils.mergeProperties(CONFIG_PATH_PREFIX + App.CLIENT_CONFLUENT_PROPERTIES,
-                CONFIG_PATH_PREFIX + App.CONSUMER_PROPERTIES);
+        val props = createConfluentProps(App.CONSUMER_PROPERTIES);
 
         try (MyConsumer consumer = new MyConsumer(App.TOPIC, props, new RecordProcessor<>())) {
             consumer.consume(durationEqualMin);

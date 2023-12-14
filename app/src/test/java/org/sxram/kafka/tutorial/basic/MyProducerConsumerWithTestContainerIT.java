@@ -23,6 +23,7 @@ import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.sxram.kafka.tutorial.TestUtils.CONFIG_PATH_PREFIX;
+import static org.sxram.kafka.tutorial.TestUtils.createProps;
 
 @Testcontainers
 class MyProducerConsumerWithTestContainerIT {
@@ -36,9 +37,9 @@ class MyProducerConsumerWithTestContainerIT {
     void consumesProducedMessages() throws IOException {
         RecordProcessor<String, String> handlerMock = spy(new RecordProcessor<>());
         Path producerConfigPath = Paths.get(CONFIG_PATH_PREFIX + App.PRODUCER_INPUT);
-        val producerProps = Utils.mergeProperties(CONFIG_PATH_PREFIX + App.PRODUCER_PROPERTIES);
+        val producerProps = createProps(App.PRODUCER_PROPERTIES);
         producerProps.put("bootstrap.servers", kafkaContainer.getBootstrapServers());
-        val consumerProps = Utils.mergeProperties(CONFIG_PATH_PREFIX + App.CONSUMER_PROPERTIES);
+        val consumerProps = createProps(App.CONSUMER_PROPERTIES);
         consumerProps.put("bootstrap.servers", kafkaContainer.getBootstrapServers());
 
         new MyProducer(App.TOPIC, producerProps).produce(Files.readAllLines(producerConfigPath));
@@ -56,9 +57,9 @@ class MyProducerConsumerWithTestContainerIT {
     void consumesProducedMessagesParallel() throws IOException {
         RecordProcessor<String, String> handlerMock = spy(new RecordProcessor<>());
         Path producerConfigPath = Paths.get(CONFIG_PATH_PREFIX + App.PRODUCER_INPUT);
-        val producerProps = Utils.mergeProperties(CONFIG_PATH_PREFIX + App.PRODUCER_PROPERTIES);
+        val producerProps = createProps(App.PRODUCER_PROPERTIES);
         producerProps.put("bootstrap.servers", kafkaContainer.getBootstrapServers());
-        val consumerProps = Utils.mergeProperties(CONFIG_PATH_PREFIX + App.CONSUMER_PROPERTIES);
+        val consumerProps = createProps(App.CONSUMER_PROPERTIES);
         consumerProps.put("bootstrap.servers", kafkaContainer.getBootstrapServers());
 
         new MyProducer(App.TOPIC, producerProps).produce(Files.readAllLines(producerConfigPath));
@@ -74,9 +75,9 @@ class MyProducerConsumerWithTestContainerIT {
     void pollsProducedMessages() throws IOException {
         RecordProcessor<String, String> recordProcessor = new RecordProcessor<>();
         Path producerConfigPath = Paths.get(CONFIG_PATH_PREFIX + App.PRODUCER_INPUT);
-        val producerProps = Utils.mergeProperties(CONFIG_PATH_PREFIX + App.PRODUCER_PROPERTIES);
+        val producerProps = createProps(App.PRODUCER_PROPERTIES);
         producerProps.put("bootstrap.servers", kafkaContainer.getBootstrapServers());
-        val consumerProps = Utils.mergeProperties(CONFIG_PATH_PREFIX + App.CONSUMER_PROPERTIES);
+        val consumerProps = createProps(App.CONSUMER_PROPERTIES);
         consumerProps.put("bootstrap.servers", kafkaContainer.getBootstrapServers());
 
         new MyProducer(App.TOPIC, producerProps).produce(Files.readAllLines(producerConfigPath));
@@ -91,7 +92,6 @@ class MyProducerConsumerWithTestContainerIT {
                 return recordProcessor.getRecords().size() >= linesCountProduced;
             });
         }
-
     }
 
 }
