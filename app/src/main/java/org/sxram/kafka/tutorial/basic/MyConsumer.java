@@ -86,7 +86,7 @@ public class MyConsumer implements AutoCloseable {
                 }
 
                 if (records.size() >= PARALLEL_PROCESSING_BATCH_SIZE) {
-                    handleParallel(records);
+                    passRecordsParallel(records);
                     consumer.commitSync();
                     records.clear();
                 }
@@ -98,7 +98,7 @@ public class MyConsumer implements AutoCloseable {
         }
     }
 
-    private void handleParallel(List<ConsumerRecord<String, String>> records) {
+    private void passRecordsParallel(List<ConsumerRecord<String, String>> records) {
         List<List<ConsumerRecord<String, String>>> partitions =
                 Lists.partition(records, PARALLEL_PROCESSING_BATCH_SIZE / PARALLEL_PROCESSING_NUM_THREADS);
 

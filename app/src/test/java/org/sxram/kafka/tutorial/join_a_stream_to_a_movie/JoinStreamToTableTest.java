@@ -25,13 +25,15 @@ import java.util.Map;
 import java.util.Properties;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.sxram.kafka.tutorial.TestUtils.CLIENT_LOCAL_TEST_PROPERTIES;
 import static org.sxram.kafka.tutorial.TestUtils.CONFIG_PATH_PREFIX;
 
 /**
  * <a href="https://developer.confluent.io/tutorials/join-a-stream-to-a-table/kstreams.html">https://developer.confluent.io/tutorials/join-a-stream-to-a-table/kstreams.html</a>
  */
 class JoinStreamToTableTest {
+
+    private static final String MOCK_SCHEMA_REGISTRY = "mock://localhost:8081";
+    private static final String PROPERTY_SCHEMA_REGISTRY_URL = "schema.registry.url";
 
     private TopologyTestDriver testDriver;
 
@@ -49,7 +51,7 @@ class JoinStreamToTableTest {
 
     private static void configureSerializer(Properties allProps, SpecificAvroSerializer<?> serializer) {
         Map<String, String> config = new HashMap<>();
-        config.put("schema.registry.url", allProps.getProperty("schema.registry.url"));
+        config.put(PROPERTY_SCHEMA_REGISTRY_URL, allProps.getProperty(PROPERTY_SCHEMA_REGISTRY_URL));
         serializer.configure(config, false);
     }
 
@@ -57,7 +59,7 @@ class JoinStreamToTableTest {
         SpecificAvroDeserializer<RatedMovie> deserializer = new SpecificAvroDeserializer<>();
 
         Map<String, String> config = new HashMap<>();
-        config.put("schema.registry.url", allProps.getProperty("schema.registry.url"));
+        config.put(PROPERTY_SCHEMA_REGISTRY_URL, allProps.getProperty(PROPERTY_SCHEMA_REGISTRY_URL));
         deserializer.configure(config, false);
 
         return deserializer;
@@ -86,8 +88,8 @@ class JoinStreamToTableTest {
     @Test
     void testJoin() {
         JoinStreamToTable jst = new JoinStreamToTable();
-        Properties allProps = Utils.mergeProperties(CONFIG_PATH_PREFIX + CLIENT_LOCAL_TEST_PROPERTIES,
-                CONFIG_PATH_PREFIX + "join-a-stream-to-a-table.properties");
+        Properties allProps = Utils.mergeProperties(CONFIG_PATH_PREFIX + "join-a-stream-to-a-table.properties");
+        allProps.put(PROPERTY_SCHEMA_REGISTRY_URL, MOCK_SCHEMA_REGISTRY);
 
         String tableTopic = allProps.getProperty("movie.topic.name");
         String streamTopic = allProps.getProperty("rating.topic.name");
