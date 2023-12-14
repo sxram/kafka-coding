@@ -1,5 +1,6 @@
 package org.sxram.kafka.tutorial.basic;
 
+import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -51,14 +52,14 @@ class MyProducerConsumerLocalContainerIT {
             consumer.consume(Duration.ofSeconds(5));
         }
 
-        try (val lines = Files.lines(producerConfigPath)) {
+        try (val lines = Files.lines(producerConfigPath).filter(l -> !l.trim().isEmpty())) {
             verify(handlerMock, atLeast((int) lines.count())).accept(any());
         }
     }
 
     @Test
     void pollsProducedMessage() throws IOException {
-        RecordProcessor<String, String> handlerMock = spy(new RecordProcessor<>());
+        RecordProcessor<String, String> recordProcessor = new RecordProcessor<>();
         Path producerConfigPath = Paths.get(CONFIG_PATH_PREFIX + App.PRODUCER_INPUT);
         val producerProps = Utils.mergeProperties(CONFIG_PATH_PREFIX + App.PRODUCER_PROPERTIES);
         producerProps.put("bootstrap.servers", kafkaContainer.getBootstrapServers());
@@ -67,12 +68,14 @@ class MyProducerConsumerLocalContainerIT {
 
         new MyProducer(App.TOPIC, producerProps).produce(Files.readAllLines(producerConfigPath));
 
-        try (val consumer = new MyConsumer(App.TOPIC, consumerProps, handlerMock);
-             val lines = Files.lines(producerConfigPath)) {
+        try (val consumer = new MyConsumer(App.TOPIC, consumerProps, recordProcessor);
+             val lines = Files.lines(producerConfigPath).filter(l -> !l.trim().isEmpty())) {
+
+            val linesCountProduced = lines.count();
 
             Unreliables.retryUntilTrue(10, TimeUnit.SECONDS, () -> {
                 consumer.poll();
-                return handlerMock.getRecords().size() >= lines.count();
+                return recordProcessor.getRecords().size() >= linesCountProduced;
             });
         }
 

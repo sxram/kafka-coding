@@ -2,6 +2,7 @@ package org.sxram.kafka.tutorial.streams;
 
 import lombok.val;
 import org.junit.jupiter.api.Test;
+import org.rnorth.ducttape.unreliables.Unreliables;
 import org.sxram.kafka.tutorial.App;
 import org.sxram.kafka.tutorial.Utils;
 import org.sxram.kafka.tutorial.basic.MyConsumer;
@@ -9,6 +10,7 @@ import org.sxram.kafka.tutorial.basic.RecordProcessor;
 
 import java.time.Duration;
 import java.util.Properties;
+import java.util.concurrent.TimeUnit;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.atLeastOnce;
@@ -28,15 +30,18 @@ class StreamsAppConfluenceIT {
         new StreamsApp().stream(props, Duration.ofSeconds(5));
 
         // assert stream by consuming output topic
-        RecordProcessor<String, String> handlerMock = spy(new RecordProcessor<>());
+        RecordProcessor<String, String> recordProcessor = new RecordProcessor<>();
         final String outputTopic = props.getProperty("output.topic.name");
         props.put("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
         props.put("value.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
         props.put("group.id", "kafka-java-getting-started");
-        try (val consumer = new MyConsumer(outputTopic, props, handlerMock)) {
-            consumer.consume(Duration.ofSeconds(10));
+        try (val consumer = new MyConsumer(outputTopic, props, recordProcessor)) {
+            Unreliables.retryUntilTrue(30, TimeUnit.SECONDS, () -> {
+                consumer.poll();
+                val countPolled = recordProcessor.getRecords().size();
+                return countPolled > 0;
+            });
         }
-        verify(handlerMock, atLeastOnce()).accept(any());
     }
 
 }

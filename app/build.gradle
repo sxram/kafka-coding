@@ -12,7 +12,8 @@ plugins {
     id "idea"
     id "eclipse"
     id "application"
-    id "com.google.cloud.tools.jib" version "3.4.0"
+    // !!! 3.4.0 -> Unsupported class file major version 63, Failed to process the entry META-INF/.../jackson-core-2.15.2.jar
+    id "com.google.cloud.tools.jib" version "3.3.1"
     id "com.github.davidmc24.gradle.plugin.avro" version "1.9.1"
 }
 
