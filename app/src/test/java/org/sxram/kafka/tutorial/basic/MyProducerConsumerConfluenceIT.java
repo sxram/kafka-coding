@@ -21,7 +21,7 @@ import static org.sxram.kafka.tutorial.TestUtils.CONFIG_PATH_PREFIX;
 class MyProducerConsumerConfluenceIT {
 
     @Test
-    void consumesProducedMessage() throws IOException {
+    void pollProducedMessages() throws IOException {
         RecordProcessor<String, String> recordProcessor = new RecordProcessor<>();
 
         val producerConfigPath = Paths.get(CONFIG_PATH_PREFIX + App.PRODUCER_INPUT);

@@ -25,7 +25,7 @@ import static org.mockito.Mockito.verify;
 import static org.sxram.kafka.tutorial.TestUtils.CONFIG_PATH_PREFIX;
 
 @Testcontainers
-class MyProducerConsumerLocalContainerIT {
+class MyProducerConsumerTestContainerIT {
 
     private static final DockerImageName KAFKA_KRAFT_TEST_IMAGE = DockerImageName.parse("confluentinc/cp-kafka:7.4.1");
 
@@ -33,7 +33,7 @@ class MyProducerConsumerLocalContainerIT {
     private static final KafkaContainer kafkaContainer = new KafkaContainer(KAFKA_KRAFT_TEST_IMAGE).withNetwork(Network.SHARED);
 
     @Test
-    void consumesProducedMessage() throws IOException {
+    void consumesProducedMessages() throws IOException {
         RecordProcessor<String, String> handlerMock = spy(new RecordProcessor<>());
         Path producerConfigPath = Paths.get(CONFIG_PATH_PREFIX + App.PRODUCER_INPUT);
         val producerProps = Utils.mergeProperties(CONFIG_PATH_PREFIX + App.PRODUCER_PROPERTIES);
@@ -53,7 +53,27 @@ class MyProducerConsumerLocalContainerIT {
     }
 
     @Test
-    void pollsProducedMessage() throws IOException {
+    void consumesProducedMessagesParallel() throws IOException {
+        RecordProcessor<String, String> handlerMock = spy(new RecordProcessor<>());
+        Path producerConfigPath = Paths.get(CONFIG_PATH_PREFIX + App.PRODUCER_INPUT);
+        val producerProps = Utils.mergeProperties(CONFIG_PATH_PREFIX + App.PRODUCER_PROPERTIES);
+        producerProps.put("bootstrap.servers", kafkaContainer.getBootstrapServers());
+        val consumerProps = Utils.mergeProperties(CONFIG_PATH_PREFIX + App.CONSUMER_PROPERTIES);
+        consumerProps.put("bootstrap.servers", kafkaContainer.getBootstrapServers());
+
+        new MyProducer(App.TOPIC, producerProps).produce(Files.readAllLines(producerConfigPath));
+
+        try (val consumer = new MyConsumer(App.TOPIC, consumerProps, handlerMock)) {
+            consumer.consumeWithParallelProcessing(Duration.ofSeconds(5));
+        }
+
+        //try (val lines = Files.lines(producerConfigPath).filter(l -> !l.trim().isEmpty())) {
+            verify(handlerMock, atLeast(MyConsumer.PARALLEL_PROCESSING_BATCH_SIZE)).accept(any());
+        //}
+    }
+
+    @Test
+    void pollsProducedMessages() throws IOException {
         RecordProcessor<String, String> recordProcessor = new RecordProcessor<>();
         Path producerConfigPath = Paths.get(CONFIG_PATH_PREFIX + App.PRODUCER_INPUT);
         val producerProps = Utils.mergeProperties(CONFIG_PATH_PREFIX + App.PRODUCER_PROPERTIES);

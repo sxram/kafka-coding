@@ -14,8 +14,8 @@ public class RecordProcessor<T, K> implements java.util.function.Consumer<Consum
     private final List<ConsumerRecord<T, K>> records = new ArrayList<>();
 
     @Override
-    public void accept(ConsumerRecord<T, K> record) {
-        log.info("Consumed: key = {}, value = {}", record.key(), record.value());
+    public synchronized void accept(ConsumerRecord<T, K> record) {
+        log.info("Processed: key = {}, value = {}", record.key(), record.value());
         records.add(record);
     }
 
