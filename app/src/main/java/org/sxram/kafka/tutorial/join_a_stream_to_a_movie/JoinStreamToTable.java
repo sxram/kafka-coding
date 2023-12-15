@@ -1,6 +1,7 @@
 package org.sxram.kafka.tutorial.join_a_stream_to_a_movie;
 
 import io.confluent.kafka.streams.serdes.avro.SpecificAvroSerde;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.admin.AdminClient;
 import org.apache.kafka.clients.admin.NewTopic;
 import org.apache.kafka.common.serialization.Serdes;
@@ -12,8 +13,6 @@ import org.apache.kafka.streams.Topology;
 import org.apache.kafka.streams.kstream.KStream;
 import org.apache.kafka.streams.kstream.KTable;
 import org.apache.kafka.streams.kstream.Produced;
-import org.sxram.kafka.tutorial.App;
-import org.sxram.kafka.tutorial.Utils;
 import org.sxram.kafka.tutorial.join_a_stream_to_a_movie.avro.Movie;
 import org.sxram.kafka.tutorial.join_a_stream_to_a_movie.avro.RatedMovie;
 import org.sxram.kafka.tutorial.join_a_stream_to_a_movie.avro.Rating;
@@ -28,6 +27,7 @@ import java.util.concurrent.CountDownLatch;
 /**
  * <a href="https://developer.confluent.io/tutorials/join-a-stream-to-a-table/kstreams.html">https://developer.confluent.io/tutorials/join-a-stream-to-a-table/kstreams.html</a>
  */
+@Slf4j
 public class JoinStreamToTable {
 
     public Topology buildTopology(Properties allProps) {
@@ -66,12 +66,11 @@ public class JoinStreamToTable {
 
     private SpecificAvroSerde<RatedMovie> ratedMovieAvroSerde(Properties allProps) {
         SpecificAvroSerde<RatedMovie> movieAvroSerde = new SpecificAvroSerde<>();
-        movieAvroSerde.configure((Map)allProps, false);
+        movieAvroSerde.configure((Map) allProps, false);
         return movieAvroSerde;
     }
 
     public void createTopics(Properties allProps) {
-        AdminClient client = AdminClient.create(allProps);
         List<NewTopic> topics = new ArrayList<>();
         topics.add(new NewTopic(
                 allProps.getProperty("movie.topic.name"),
@@ -93,37 +92,34 @@ public class JoinStreamToTable {
                 Integer.parseInt(allProps.getProperty("rated.movies.topic.partitions")),
                 Short.parseShort(allProps.getProperty("rated.movies.topic.replication.factor"))));
 
+        AdminClient client = AdminClient.create(allProps);
         client.createTopics(topics);
         client.close();
     }
 
-    public static void main(String[] args) {
-        JoinStreamToTable ts = new JoinStreamToTable();
-        Properties allProps = Utils.mergeProperties("config/" + App.CLIENT_CONFLUENT_PROPERTIES, "config/" + "join-a-stream-to-a-table.properties");
-        allProps.put(StreamsConfig.DEFAULT_KEY_SERDE_CLASS_CONFIG, Serdes.String().getClass());
-        allProps.put(StreamsConfig.DEFAULT_VALUE_SERDE_CLASS_CONFIG, SpecificAvroSerde.class);
-        Topology topology = ts.buildTopology(allProps);
+    public void run(final Properties props) throws InterruptedException {
+        props.put(StreamsConfig.DEFAULT_KEY_SERDE_CLASS_CONFIG, Serdes.String().getClass());
+        props.put(StreamsConfig.DEFAULT_VALUE_SERDE_CLASS_CONFIG, SpecificAvroSerde.class);
+        Topology topology = buildTopology(props);
 
-        ts.createTopics(allProps);
+        createTopics(props);
 
-        final KafkaStreams streams = new KafkaStreams(topology, allProps);
-        final CountDownLatch latch = new CountDownLatch(1);
+        try (final KafkaStreams streams = new KafkaStreams(topology, props)) {
+            final CountDownLatch latch = new CountDownLatch(1);
 
-        // Attach shutdown handler to catch Control-C.
-        Runtime.getRuntime().addShutdownHook(new Thread("streams-shutdown-hook") {
-            @Override
-            public void run() {
-                streams.close(Duration.ofSeconds(5));
-                latch.countDown();
-            }
-        });
+            // Attach shutdown handler to catch Control-C.
+            Runtime.getRuntime().addShutdownHook(new Thread("streams-shutdown-hook") {
+                @Override
+                public void run() {
+                    streams.close(Duration.ofSeconds(5));
+                    latch.countDown();
+                }
+            });
 
-        try {
             streams.start();
             latch.await();
-        } catch (Throwable e) {
-            System.exit(1);
         }
         System.exit(0);
     }
+
 }
