@@ -1,45 +1,32 @@
 package org.sxram.kafka.tutorial.basic;
 
 import lombok.extern.slf4j.Slf4j;
-import lombok.val;
-import org.junit.jupiter.api.Test;
-import org.rnorth.ducttape.unreliables.Unreliables;
 import org.sxram.kafka.tutorial.App;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.concurrent.TimeUnit;
+import java.util.Properties;
 
-import static org.sxram.kafka.tutorial.TestUtils.CONFIG_PATH_PREFIX;
 import static org.sxram.kafka.tutorial.TestUtils.createConfluentProps;
 
 /**
  * Test against confluent server.
  */
 @Slf4j
-class MyProducerConsumerToConfluenceServerIT {
+class MyProducerConsumerToConfluenceServerIT extends AbstractMyProducerConsumerIT {
 
-    @Test
-    void pollProducedMessages() throws IOException {
-        RecordProcessor<String, String> recordProcessor = new RecordProcessor<>();
+    @Override
+    Properties getConsumerProps() {
+        return createConfluentProps(App.CONSUMER_PROPERTIES);
+    }
 
-        val producerConfigPath = Paths.get(CONFIG_PATH_PREFIX + App.PRODUCER_INPUT);
+    @Override
+    Properties getProducerProps() {
+        return createConfluentProps(App.PRODUCER_PROPERTIES);
+    }
 
-        new MyProducer(App.TOPIC, createConfluentProps(App.PRODUCER_PROPERTIES)).produce(Files.readAllLines(producerConfigPath));
-
-        try (val consumer = new MyConsumer(App.TOPIC, createConfluentProps(App.CONSUMER_PROPERTIES), recordProcessor);
-             val lines = Files.lines(producerConfigPath).filter(l -> !l.trim().isEmpty())) {
-
-            val linesCountProduced = lines.count();
-
-            Unreliables.retryUntilTrue(30, TimeUnit.SECONDS, () -> {
-                consumer.poll();
-                val countPolled = recordProcessor.getRecords().size();
-                return countPolled >= linesCountProduced;
-            });
-
-        }
+    @Override
+    String getBootstrapServers() {
+        // not needed, taken from config file
+        return null;
     }
 
 }
