@@ -1,4 +1,4 @@
-# CLI commands - Topics / Consume / Produce
+# Confuence CLI commands - Topics / Consume / Produce
 
 ```shell
 confluent kafka topic list
@@ -22,6 +22,28 @@ Produce
 ```shell
 confluent kafka topic produce <topic>
 confluent kafka topic produce <topic> --value-format avro --schema orders-avro-schema.json --parse-key
+```
+
+# Kcat CLI commands - Authentication
+
+Broker info
+
+```shell
+kcat -b pkc-75m1o.europe-west3.gcp.confluent.cloud:9092 -L -J \
+  -X security.protocol=SASL_SSL \ 
+  -X sasl.username=<API_KEY> \ 
+  -X saslpassword=<API_KEY_SECRET> \
+  -X sasl.mechanism=PLAIN
+```
+
+Read messages from topic + auth
+
+```shell
+kcat -b pkc-75m1o.europe-west3.gcp.confluent.cloud:9092 -t my-topic \
+  -X security.protocol=SASL_SSL \
+  -X sasl.username=<API_KEY> \
+  -X saslpassword=<API_KEY_SECRET> \
+  -X sasl.mechanism=PLAIN
 ```
 
 # Streams
