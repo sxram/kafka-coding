@@ -63,7 +63,7 @@ dependencies {
 
     testImplementation 'org.junit.jupiter:junit-jupiter:5.10.1'
     testImplementation 'org.testcontainers:junit-jupiter:1.19.3'
-    testImplementation 'org.testcontainers:kafka:1.19.3'
+    testImplementation 'org.testcontainers:kafka:1.19.4'
     testCompileOnly 'org.projectlombok:lombok:1.18.30'
     testAnnotationProcessor 'org.projectlombok:lombok:1.18.30'
     testImplementation 'org.apache.kafka:kafka-streams-test-utils:3.4.0'
